@@ -312,7 +312,8 @@
                                             {{ Form::select('role', [
                                                 'Responsable Hiérarchique' => 'Responsable Hiérarchique',
                                                 'Agent' => 'Agent',
-                                                'Agent/Administrateur' => 'Agent/Administrateur',
+                                                'Administrator (Employee)' => 'Administrator (Employee)',
+                                                'Line Manager (Employee)' => 'Line Manager (Employee)',
                                             ], null, [
                                                 'class' => 'form-control role', 
                                                 'required' => 'required', 
