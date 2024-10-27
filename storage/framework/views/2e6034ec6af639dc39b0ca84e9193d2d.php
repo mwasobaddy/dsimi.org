@@ -144,6 +144,158 @@
                     </div>
                 </div>
             </div>
+
+        <?php elseif(\Auth::user()->type == 'Line Manager (Employee)'): ?>
+            <div class="col-xxl-6">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <h5><?php echo e(__('Calendar')); ?></h5>
+                                <input type="hidden" id="path_admin" value="<?php echo e(url('/')); ?>">
+                            </div>
+                            <div class="col-lg-6">
+                                
+                                <label for=""></label>
+                                <?php if(isset($setting['is_enabled']) && $setting['is_enabled'] == 'on'): ?>
+                                    <select class="form-control" name="calender_type" id="calender_type"
+                                        style="float: right;width: 155px;" onchange="get_data()">
+                                        <option value="google_calender"><?php echo e(__('Google Calendar')); ?></option>
+                                        <option value="local_calender" selected="true">
+                                            <?php echo e(__('Local Calendar')); ?></option>
+                                    </select>
+                                <?php endif; ?>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id='event_calendar' class='calendar'></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-6">
+                <div class="card" style="height: 230px;">
+                    <div class="card-header">
+                        <h5><?php echo e(__('Mark Attandance')); ?></h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted pb-0-5">
+                            <?php echo e(__('My Office Time: ' . $officeTime['startTime'] . ' to ' . $officeTime['endTime'])); ?></p>
+                        <div class="row">
+                            <div class="col-md-6 float-right border-right">
+                                <?php echo e(Form::open(['url' => 'attendanceemployee/attendance', 'method' => 'post'])); ?>
+
+                                <?php if(empty($employeeAttendance) || $employeeAttendance->clock_out != '00:00:00'): ?>
+                                    <button type="submit" value="0" name="in" id="clock_in"
+                                        class="btn btn-primary"><?php echo e(__('CLOCK IN')); ?></button>
+                                <?php else: ?>
+                                    <button type="submit" value="0" name="in" id="clock_in"
+                                        class="btn btn-primary disabled" disabled><?php echo e(__('CLOCK IN')); ?></button>
+                                <?php endif; ?>
+                                <?php echo e(Form::close()); ?>
+
+                            </div>
+                            <div class="col-md-6 float-left">
+                                <?php if(!empty($employeeAttendance) && $employeeAttendance->clock_out == '00:00:00'): ?>
+                                    <?php echo e(Form::model($employeeAttendance, ['route' => ['attendanceemployee.update', $employeeAttendance->id], 'method' => 'PUT'])); ?>
+
+                                    <button type="submit" value="1" name="out" id="clock_out"
+                                        class="btn btn-danger"><?php echo e(__('CLOCK OUT')); ?></button>
+                                <?php else: ?>
+                                    <button type="submit" value="1" name="out" id="clock_out"
+                                        class="btn btn-danger disabled" disabled><?php echo e(__('CLOCK OUT')); ?></button>
+                                <?php endif; ?>
+                                <?php echo e(Form::close()); ?>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="height: 402px;">
+                    <div class="card-header card-body table-border-style">
+                        <h5><?php echo e(__('Meeting schedule')); ?></h5>
+                    </div>
+                    <div class="card-body" style="height: 320px">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th><?php echo e(__('Meeting title')); ?></th>
+                                        <th><?php echo e(__('Meeting Date')); ?></th>
+                                        <th><?php echo e(__('Meeting Time')); ?></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="list">
+                                    <?php $__currentLoopData = $meetings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $meeting): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <tr>
+                                            <td><?php echo e($meeting->title); ?></td>
+                                            <td><?php echo e(\Auth::user()->dateFormat($meeting->date)); ?></td>
+                                            <td><?php echo e(\Auth::user()->timeFormat($meeting->time)); ?></td>
+                                        </tr>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-12 col-lg-12 col-md-12">
+                <div class="card">
+                    <div class="card-header card-body table-border-style">
+                        <h5><?php echo e(__('Announcement List')); ?></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th><?php echo e(__('Title')); ?></th>
+                                        <th><?php echo e(__('Start Date')); ?></th>
+                                        <th><?php echo e(__('End Date')); ?></th>
+                                        <th><?php echo e(__('Description')); ?></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="list">
+                                    <?php $__currentLoopData = $announcements; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $announcement): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <tr>
+                                            <td><?php echo e($announcement->title); ?></td>
+                                            <td><?php echo e(\Auth::user()->dateFormat($announcement->start_date)); ?></td>
+                                            <td><?php echo e(\Auth::user()->dateFormat($announcement->end_date)); ?></td>
+                                            <td><?php echo e($announcement->description); ?></td>
+                                        </tr>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header card-body table-border-style">
+                    <h5><?php echo e(__("Today's Not Clock In")); ?></h5>
+                </div>
+                <div class="card-body" style="height: 324px; overflow:auto">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th><?php echo e(__('Name')); ?></th>
+                                    <th><?php echo e(__('Status')); ?></th>
+                                </tr>
+                            </thead>
+                            <tbody class="list">
+                                <?php $__currentLoopData = $notClockIns; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $notClockIn): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <tr>
+                                        <td><?php echo e($notClockIn->name); ?></td>
+                                        <td><span class="absent-btn"><?php echo e(__('Absent')); ?></span></td>
+                                    </tr>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         <?php else: ?>
             <div class="col-xxl-12">
 

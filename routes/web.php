@@ -362,6 +362,12 @@ Route::group(['middleware' => ['verified']], function () {
             'XSS',
         ]
     );
+    Route::get('show-employee-supervise', [EmployeeController::class, 'showEmployeeSupervise'])
+    ->name('show_employee_supervise.showall')
+    ->middleware([
+        'auth',
+        'XSS',
+    ]);
     Route::get('lastlogin', [EmployeeController::class, 'lastLogin'])->name('lastlogin')->middleware(
         [
             'auth',

@@ -40,7 +40,33 @@ class EmployeeController extends Controller
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
-     */
+    */
+
+    
+public function showEmployeeSupervise()
+{
+    if(Auth::user()->can('Manage Employee'))
+    {
+        $currentEmployee = Employee::where('user_id', Auth::user()->id)->first();
+        
+        if (!$currentEmployee) {
+            return redirect()->back()->with('error', __('Employee not found.'));
+        }
+
+        $employees = Employee::where(function($query) use ($currentEmployee) {
+            $query->where('supervisor_n1', $currentEmployee->name)
+                  ->orWhere('supervisor_n2', $currentEmployee->name);
+        })->get();
+
+        return view('employee.show_employee_supervise', compact('employees', 'currentEmployee'));
+    }
+    else
+    {
+        return redirect()->back()->with('error', __('Permission denied.'));
+    }
+}
+
+
     public function index()
     {
 
@@ -182,195 +208,59 @@ class EmployeeController extends Controller
             } else {
                 $document_implode = null;
             }
-            
 
 
-
-
-
-
-
-
-            if (\Auth::user()->can('Create User')) {
-                $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->where('created_by', \Auth::user()->creatorId())->first();
-    
-                // new company default language
-                if ($default_language == null) {
-                    $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->first();
-                }
-    
-                do {
-                    $code = rand(100000, 999999);
-                } while (User::where('referral_code', $code)->exists());
-    
-                if (\Auth::user()->type == 'super admin') {
-                    $date = date("Y-m-d H:i:s");
-                    $userpassword = $request->input('password');
-                    $user = User::create(
-                        [
-                            'name' => $request['name'],
-                            'email' => $request['email'],
-                            'is_login_enable' => !empty($request->password_switch) && $request->password_switch == 'on' ? 1 : 0,
-                            'password' => !empty($userpassword) ? Hash::make($userpassword) : null,
-                            'type' => 'company',
-                            'plan' => $plan = Plan::where('price', '<=', 0)->first()->id,
-                            'lang' => !empty($default_language) ? $default_language->value : 'en',
-                            'referral_code' => $code,
-                            'created_by' => \Auth::user()->id,
-                            'email_verified_at' => $date,
-                        ]
-                    );
-    
-                    $user->assignRole('Company');
-                    $user->userDefaultData();
-                    $user->userDefaultDataRegister($user->id);
-                    GenerateOfferLetter::defaultOfferLetterRegister($user->id);
-                    ExperienceCertificate::defaultExpCertificatRegister($user->id);
-                    JoiningLetter::defaultJoiningLetterRegister($user->id);
-                    NOC::defaultNocCertificateRegister($user->id);
-                    Utility::jobStage($user->id);
-                    $role_r = Role::findById(2);
-    
-                    //create company default roles
-                    Utility::MakeRole($user->id);
-                } else {
-                    $objUser    = \Auth::user()->creatorId();
-                    $objUser = User::find($objUser);
-                    $total_user = $objUser->countUsers();
-                    $plan       = Plan::find($objUser->plan);
-                    $userpassword = $request->input('password');
-    
-                    if ($total_user < $plan->max_users || $plan->max_users == -1) {
-                        
-
-                        $role_fetch = $request['role'];
-
-                        if ($role_fetch === 'Agent (Employee)') {
-                            $role_fetch = 'employee'; // Use '=' for assignment
-                        }
-
-                        $role_r = Role::findByName($role_fetch);
-                        $date = date("Y-m-d H:i:s");
-                        $user   = User::create(
-                            [
-                                'name' => $request['first_name'] . ' ' . $request['last_name'],
-                                'email' => $request['email'],
-                                'is_login_enable' => 1,
-                                'password' => !empty($userpassword) ? Hash::make($userpassword) : null,
-                                'type' => $role_r->name,
-                                'lang' => !empty($default_language) ? $default_language->value : 'en',
-                                'created_by' => \Auth::user()->creatorId(),
-                                'email_verified_at' => $date,
-                            ]
-                        );
+           
 
                                         
-                        $db_emp_role = $request['role'];
+            $db_emp_role = $request['role'];
 
-                        if ($db_emp_role === 'Agent (Employee)') {
-                            $db_emp_role = 'Agent'; // Use '=' for assignment
-                        }
-
-
-                        
-                        $employee = Employee::create(
-                            [
-                                'user_id' => $user->id,
-                                'first_name' => $request['first_name'],
-                                'last_name' => $request['last_name'],
-                                'name' => $request['first_name'] . ' ' . $request['last_name'],
-                                'dob' => $request['dob'],
-                                'gender' => $request['gender'],
-                                'phone' => $request['phone'],
-                                'address' => $request['address'],
-                                'email' => $request['email'],
-                                'password' => Hash::make($request['password']),
-                                'employee_id' => $this->employeeNumber(),
-                                'biometric_emp_id' => !empty($request['biometric_emp_id']) ? $request['biometric_emp_id'] : '',
-                                'branch_id' => $request['branch_id'],
-                                'department_id' => $request['department_id'],
-                                'designation_id' => 0,
-                                'company_doj' => $request['company_doj'],
-                                'documents' => $document_implode,
-                                'account_holder_name' => $request['account_holder_name'],
-                                'account_number' => $request['account_number'],
-                                'bank_name' => $request['bank_name'],
-                                'bank_identifier_code' => $request['bank_identifier_code'],
-                                'branch_location' => $request['branch_location'],
-                                'tax_payer_id' => $request['tax_payer_id'],
-                                'registration_number' => $request['registration_number'],
-                                'title' => $request['title'],
-                                'civil_service_doe' => $request['civil_service_doe'],
-                                'dsimi_doe' => $request['dsimi_doe'],
-                                'contract_type' => $request['contract_type'],
-                                'services' => $request['services'],
-                                'job' => $request['job'],
-                                'position' => $request['position'],
-                                'grade' => $request['grade'],
-                                'supervisor_n1' => $request['supervisor_n1'],
-                                'supervisor_n2' => $request['supervisor_n2'],
-                                'role' => $db_emp_role,
-                                'created_by' => \Auth::user()->creatorId(),
-                            ]
-                        );
-
-
-
-
-
-
-
-                    } else {
-                        return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
-                    }
-                }
-    
-                $setings = Utility::settings();
-    
-    
-                if ($setings['new_user'] == 1) {
-    
-                    $uArr = [
-                        'email' => $user->email,
-                        'password' => $request->password,
-                    ];
-    
-                    $resp = Utility::sendEmailTemplate('new_user', [$user->id => $user->email], $uArr);
-    
-                    return redirect()->route('employee.index')->with('success', __('User successfully created.') . ((!empty($resp) && $resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
-                }
-                return redirect()->route('employee.index')->with('success', __('User successfully created.'));
-            } else {
-                return response()->json(['error' => __('Permission denied.')], 401);
+            if ($db_emp_role === 'Agent (Employee)') {
+                $db_emp_role = 'Agent'; // Use '=' for assignment
             }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            
+            $employee = Employee::create(
+                [
+                    'user_id' => $user->id,
+                    'first_name' => $request['first_name'],
+                    'last_name' => $request['last_name'],
+                    'name' => $request['first_name'] . ' ' . $request['last_name'],
+                    'dob' => $request['dob'],
+                    'gender' => $request['gender'],
+                    'phone' => $request['phone'],
+                    'address' => $request['address'],
+                    'email' => $request['email'],
+                    'password' => Hash::make($request['password']),
+                    'employee_id' => $this->employeeNumber(),
+                    'biometric_emp_id' => !empty($request['biometric_emp_id']) ? $request['biometric_emp_id'] : '',
+                    'branch_id' => $request['branch_id'],
+                    'department_id' => $request['department_id'],
+                    'designation_id' => 0,
+                    'company_doj' => $request['company_doj'],
+                    'documents' => $document_implode,
+                    'account_holder_name' => $request['account_holder_name'],
+                    'account_number' => $request['account_number'],
+                    'bank_name' => $request['bank_name'],
+                    'bank_identifier_code' => $request['bank_identifier_code'],
+                    'branch_location' => $request['branch_location'],
+                    'tax_payer_id' => $request['tax_payer_id'],
+                    'registration_number' => $request['registration_number'],
+                    'title' => $request['title'],
+                    'civil_service_doe' => $request['civil_service_doe'],
+                    'dsimi_doe' => $request['dsimi_doe'],
+                    'contract_type' => $request['contract_type'],
+                    'services' => $request['services'],
+                    'job' => $request['job'],
+                    'position' => $request['position'],
+                    'grade' => $request['grade'],
+                    'supervisor_n1' => $request['supervisor_n1'],
+                    'supervisor_n2' => $request['supervisor_n2'],
+                    'role' => $db_emp_role,
+                    'created_by' => \Auth::user()->creatorId(),
+                ]
+            );
 
 
 

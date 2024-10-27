@@ -159,6 +159,19 @@
                             class="dash-link"><span class="dash-micon"><i class="ti ti-user"></i></span><span
                                 class="dash-mtext">{{ __('Employee') }}</span></a>
                     </li>
+
+                @elseif(\Auth::user()->type == 'Line Manager (Employee)')
+                    @php
+                        $currentEmployee = App\Models\Employee::where('user_id', \Auth::user()->id)->first();
+                        $employees = App\Models\Employee::where('supervisor_n1', $currentEmployee->name)
+                            ->orWhere('supervisor_n2', $currentEmployee->name)
+                            ->get();
+                    @endphp
+                    <li class="dash-item {{ Request::segment(1) == 'employee' ? 'active' : '' }}">
+                        <a href="{{ route('show_employee_supervise.showall') }}" class="dash-link"><span class="dash-micon"><i
+                                    class="ti ti-user"></i></span><span
+                                class="dash-mtext">{{ __('Mes collaborateurs') }}</span></a>
+                    </li>
                 @else
                     <li class="dash-item {{ Request::segment(1) == 'employee' ? 'active' : '' }}">
                         <a href="{{ route('employee.index') }}" class="dash-link"><span class="dash-micon"><i
@@ -410,7 +423,7 @@
                     Gate::check('Manage Warning') ||
                     Gate::check('Manage Termination') ||
                     Gate::check('Manage Announcement') ||
-                    Gate::check('Manage Holiday')) && Auth::user()->type != 'employee')
+                    Gate::check('Manage Holiday')) && Auth::user()->type != 'employee' && Auth::user()->type != 'Line Manager (Employee)')
                 <li
                     class="dash-item dash-hasmenu {{ Request::segment(1) == 'holiday' ? 'dash-trigger active' : '' }}">
                     <a href="#!" class="dash-link">
