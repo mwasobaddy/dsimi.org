@@ -152,7 +152,7 @@
             @if (Gate::check('Manage Employee'))
                 @if (\Auth::user()->type == 'employee')
                     @php
-                        $employee = App\Models\Employee::where('email', \Auth::user()->email)->first();
+                        $employee = App\Models\Employee::where('user_id', \Auth::user()->id)->first();
                     @endphp
                     <li class="dash-item {{ Request::segment(1) == 'employee' ? 'active' : '' }}">
                         <a href="{{ route('employee.show', \Illuminate\Support\Facades\Crypt::encrypt($employee->id)) }}"

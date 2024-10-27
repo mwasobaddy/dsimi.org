@@ -148,7 +148,7 @@
             <?php if(Gate::check('Manage Employee')): ?>
                 <?php if(\Auth::user()->type == 'employee'): ?>
                     <?php
-                        $employee = App\Models\Employee::where('email', \Auth::user()->email)->first();
+                        $employee = App\Models\Employee::where('user_id', \Auth::user()->id)->first();
                     ?>
                     <li class="dash-item <?php echo e(Request::segment(1) == 'employee' ? 'active' : ''); ?>">
                         <a href="<?php echo e(route('employee.show', \Illuminate\Support\Facades\Crypt::encrypt($employee->id))); ?>"
