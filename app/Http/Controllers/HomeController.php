@@ -39,10 +39,10 @@ class HomeController extends Controller
     {
 
         if (Auth::check()) {
-		$user = Auth::user();
+		    $user = Auth::user();
 		
             if ($user->type =='employee') {
-                $emp = Employee::where('user_id', '=', $user->id)->first();
+                $emp = Employee::where('email', '=', $user->email)->first();
 
                 $announcements = Announcement::orderBy('announcements.id', 'desc')->take(5)->leftjoin('announcement_employees', 'announcements.id', '=', 'announcement_employees.announcement_id')->where('announcement_employees.employee_id', '=', $emp->id)->orWhere(
                     function ($q) {
@@ -86,7 +86,8 @@ class HomeController extends Controller
                 $officeTime['endTime']   = Utility::getValByName('company_end_time');
 
                 return view('dashboard.dashboard', compact('arrEvents', 'announcements', 'employees', 'meetings', 'employeeAttendance', 'officeTime'));
-            } else if ($user->type == 'super admin') {
+            } 
+            else if ($user->type == 'super admin') {
                 $user                       = \Auth::user();
                 $user['total_user']         = $user->countCompany();
                 $user['total_paid_user']    = $user->countPaidCompany();
@@ -98,7 +99,8 @@ class HomeController extends Controller
                 $chartData = $this->getOrderChart(['duration' => 'week']);
 
                 return view('dashboard.admin', compact('user', 'chartData'));
-            } else {
+            } 
+            else {
 
                 $events    = Event::where('created_by', '=', \Auth::user()->creatorId())->get();
                 $arrEvents = [];
@@ -114,7 +116,7 @@ class HomeController extends Controller
                     $arr['url']             = route('event.edit', $event['id']);
 
                     $arrEvents[] = $arr;
-		}
+		        }
 		
 
                 $announcements = Announcement::orderBy('announcements.id', 'desc')->take(5)->where('created_by', '=', \Auth::user()->creatorId())->get();

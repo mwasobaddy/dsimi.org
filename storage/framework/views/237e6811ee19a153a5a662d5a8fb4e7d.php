@@ -21,4 +21,4 @@
     const getMaxUploadSize = <?php echo e(Chatify::getMaxUploadSize()); ?>;
 </script>
 <script src="<?php echo e(asset('js/chatify/code.js')); ?>"></script>
-<?php /**PATH C:\xampp\htdocs\dsimi.orgbackup\vendor\munafio\chatify\src/views/layouts/footerLinks.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\xampp\htdocs\dsimi.org\vendor\munafio\chatify\src/views/layouts/footerLinks.blade.php ENDPATH**/ ?>
