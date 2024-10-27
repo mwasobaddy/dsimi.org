@@ -46,7 +46,9 @@
                                     <th>{{ __('Total Days') }}</th>
                                     <th>{{ __('Leave Reason') }}</th>
                                     <th>{{ __('Status') }}</th>
+                                    <th>{{ __('Certificate') }}</th>
                                     <th width="200px">{{ __('Action') }}</th>
+                                  
                                 </tr>
                             </thead>
                             <tbody>
@@ -81,6 +83,14 @@
                                                     {{ $leave->status }}
                                                 </div>
                                             @endif
+                                        </td>
+                                        <td>
+                                        @if($leave->status == 'Approved' && $leave->certificate_path)
+    <a href="{{ route('leave.certificate.download', $leave->id) }}" 
+       class="btn btn-sm btn-primary">
+        Download Certificate
+    </a>
+@endif
                                         </td>
                                         <td class="Action">
                                             <span>

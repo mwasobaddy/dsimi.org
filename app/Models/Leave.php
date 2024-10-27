@@ -8,7 +8,7 @@ class Leave extends Model
 {
     protected $fillable = [
         'employee_id',
-        'Leave_type_id',
+        'leave_type_id',
         'applied_on',
         'start_date',
         'end_date',
@@ -17,6 +17,14 @@ class Leave extends Model
         'remark',
         'status',
         'created_by',
+        'employee_title',
+        'employee_name',
+        'employee_id_number',
+        'employee_position',
+        'employee_department',
+        'leave_type_name',
+        'year',
+        'certificate_path'
     ];
 
     public function leaveType()

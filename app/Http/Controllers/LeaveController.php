@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\Leave as LocalLeave;
 use App\Models\LeaveType;
+use App\Services\LeaveCertificateService;
+use Illuminate\Support\Facades\Storage;
 use App\Mail\LeaveActionSend;
 use App\Models\Utility;
 use Illuminate\Http\Request;
@@ -17,6 +19,12 @@ use Spatie\GoogleCalendar\Event as GoogleEvent;
 
 class LeaveController extends Controller
 {
+    protected $certificateService;
+
+    public function __construct(LeaveCertificateService $certificateService)
+    {
+        $this->certificateService = $certificateService;
+    }
     public function index()
     {
 
@@ -289,57 +297,127 @@ class LeaveController extends Controller
     }
 
     public function changeaction(Request $request)
-    {
+{
+    try {
+        \Log::info('Change action started for leave_id: ' . $request->leave_id);
+        
         $leave = LocalLeave::find($request->leave_id);
+        \Log::info('Current leave status: ' . $leave->status);
+        \Log::info('New status requested: ' . $request->status);
 
         $leave->status = $request->status;
+
         if ($leave->status == 'Approved') {
-            $startDate               = new \DateTime($leave->start_date);
-            $endDate                 = new \DateTime($leave->end_date);
+            \Log::info('Leave approved, starting certificate generation process');
+            
+            $startDate = new \DateTime($leave->start_date);
+            $endDate = new \DateTime($leave->end_date);
             $endDate->add(new \DateInterval('P1D'));
-            // $total_leave_days        = $startDate->diff($endDate)->days;
-            $total_leave_days        = !empty($startDate->diff($endDate)) ? $startDate->diff($endDate)->days : 0;
+            $total_leave_days = !empty($startDate->diff($endDate)) ? $startDate->diff($endDate)->days : 0;
             $leave->total_leave_days = $total_leave_days;
-            $leave->status           = 'Approved';
+            
+            // Get employee details for certificate
+            $employee = Employee::with('designation', 'department')->find($leave->employee_id);
+            \Log::info('Employee details retrieved: ', ['employee_id' => $employee->id, 'name' => $employee->name]);
+            
+            $leave_type = LeaveType::find($leave->leave_type_id);
+            \Log::info('Leave type retrieved: ', ['leave_type_id' => $leave_type->id, 'title' => $leave_type->title]);
+            
+            // Add certificate-related attributes
+            $leave->employee_title = $employee->gender == 'M' ? 'M.' : 'Mme';
+            $leave->employee_name = $employee->name;
+            $leave->employee_id_number = $employee->employee_id;
+            $leave->employee_position = $employee->designation->name ?? $employee->position;
+            $leave->employee_department = $employee->department->name ?? '';
+            $leave->leave_type_name = $leave_type->title;
+            $leave->year = date('Y');
+
+            // Generate the certificate
+            try {
+                \Log::info('Starting certificate generation');
+                $certificateService = app(LeaveCertificateService::class);
+                $certificateFilename = $certificateService->generateCertificate($leave);
+                \Log::info('Certificate generated: ' . $certificateFilename);
+                
+                $leave->certificate_path = $certificateFilename;
+                \Log::info('Certificate path saved to leave record');
+            } catch (\Exception $e) {
+                \Log::error('Certificate generation failed: ' . $e->getMessage());
+                \Log::error($e->getTraceAsString());
+            }
         }
 
         $leave->save();
+        \Log::info('Leave record saved successfully');
 
-        // twilio
-        $setting = Utility::settings(\Auth::user()->creatorId());
-        $emp = Employee::find($leave->employee_id);
-        if (isset($setting['twilio_leave_approve_notification']) && $setting['twilio_leave_approve_notification'] == 1) {
-            // $msg = __("Your leave has been") . ' ' . $leave->status . '.';
-
-            $uArr = [
-                'leave_status' => $leave->status,
-            ];
-
-
-            Utility::send_twilio_msg($emp->phone, 'leave_approve_reject', $uArr);
-        }
-
-        $setings = Utility::settings();
-
-        if ($setings['leave_status'] == 1) {
-            $employee     = Employee::where('id', $leave->employee_id)->where('created_by', '=', \Auth::user()->creatorId())->first();
-
-            $uArr = [
-                'leave_email' => $employee->email,
-                'leave_status_name' => $employee->name,
-                'leave_status' => $request->status,
-                'leave_reason' => $leave->leave_reason,
-                'leave_start_date' => $leave->start_date,
-                'leave_end_date' => $leave->end_date,
-                'total_leave_days' => $leave->total_leave_days,
-
-            ];
-            $resp = Utility::sendEmailTemplate('leave_status', [$employee->email], $uArr);
-            return redirect()->route('leave.index')->with('success', __('Leave status successfully updated.') . ((!empty($resp) && $resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
-        }
-
-        return redirect()->route('leave.index')->with('success', __('Leave status successfully updated.'));
+    // twilio
+    $setting = Utility::settings(\Auth::user()->creatorId());
+    $emp = Employee::find($leave->employee_id);
+    if (isset($setting['twilio_leave_approve_notification']) && $setting['twilio_leave_approve_notification'] == 1) {
+        $uArr = [
+            'leave_status' => $leave->status,
+        ];
+        Utility::send_twilio_msg($emp->phone, 'leave_approve_reject', $uArr);
     }
+
+    $setings = Utility::settings();
+
+    if ($setings['leave_status'] == 1) {
+        $employee = Employee::where('id', $leave->employee_id)
+            ->where('created_by', '=', \Auth::user()->creatorId())
+            ->first();
+
+        $uArr = [
+            'leave_email' => $employee->email,
+            'leave_status_name' => $employee->name,
+            'leave_status' => $request->status,
+            'leave_reason' => $leave->leave_reason,
+            'leave_start_date' => $leave->start_date,
+            'leave_end_date' => $leave->end_date,
+            'total_leave_days' => $leave->total_leave_days,
+        ];
+
+        // Add certificate download link if leave was approved
+        if ($leave->status == 'Approved' && $leave->certificate_path) {
+            $certificateUrl = Storage::disk('public')->url('certificates/' . $leave->certificate_path);
+            $uArr['certificate_link'] = $certificateUrl;
+        }
+
+        $resp = Utility::sendEmailTemplate('leave_status', [$employee->email], $uArr);
+        return redirect()->route('leave.index')->with('success', __('Leave status successfully updated.') . 
+            ((!empty($resp) && $resp['is_success'] == false && !empty($resp['error'])) ? 
+            '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
+    }
+
+    return redirect()->route('leave.index')->with('success', __('Leave status successfully updated.'));
+} catch (\Exception $e) {
+    \Log::error('Error in changeaction: ' . $e->getMessage());
+    \Log::error($e->getTraceAsString());
+    return redirect()->route('leave.index')->with('error', __('An error occurred while updating leave status.'));
+}
+}
+
+public function downloadCertificate($leaveId)
+{
+    $leave = LocalLeave::findOrFail($leaveId);
+    
+    // Check if user has permission to download
+    if (!\Auth::user()->can('Manage Leave') && 
+        \Auth::user()->id != $leave->employee()->first()->user_id) {
+        return redirect()->back()->with('error', __('Permission denied.'));
+    }
+
+    // Check if certificate exists
+    if (!$leave->certificate_path || 
+        !Storage::disk('public')->exists('certificates/' . $leave->certificate_path)) {
+        return redirect()->back()->with('error', __('Certificate not found.'));
+    }
+
+    return Storage::disk('public')->download(
+        'certificates/' . $leave->certificate_path,
+        'leave_certificate_' . $leave->employee_name . '.pdf'
+    );
+}
 
     public function jsoncount(Request $request)
     {
