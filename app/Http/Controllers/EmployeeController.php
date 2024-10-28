@@ -175,7 +175,16 @@ class EmployeeController extends Controller
                 $document_implode = null;
             }
 
-
+        // // Create the user first
+        // $user = User::create([
+        //     'name' => $request['first_name'] . ' ' . $request['last_name'],
+        //     'email' => $request['email'],
+        //     'password' => Hash::make($request['password']),
+        //     'type' => 'employee',
+        //     'lang' => !empty($default_language) ? $default_language->value : 'en',
+        //     'created_by' => \Auth::user()->creatorId(),
+        //     'email_verified_at' => now(), // Make sure $date is defined or use 'now()'
+        // ]);
             $employee = Employee::create(
                 [
                     'user_id' => $user->id,
@@ -216,6 +225,7 @@ class EmployeeController extends Controller
                     'created_by' => \Auth::user()->creatorId(),
                 ]
             );
+           
 
             if ($request->hasFile('document')) {
                 foreach ($request->document as $key => $document) {
