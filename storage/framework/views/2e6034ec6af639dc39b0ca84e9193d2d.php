@@ -32,11 +32,12 @@
                     <div class="row">
                         <?php echo e(Form::open(['url' => 'attendanceemployee/attendance', 'method' => 'post', 'class' => 'd-flex flex-column align-items-center'])); ?>
 
+                        
                             <?php if(!empty($employeeAttendance) && $employeeAttendance->clock_out == '00:00:00'): ?>
                                 <div class="form-group col-lg-8 col-md-8">
-                                    <?php echo e(Form::label('remarks', __('Remarks (Maximum Characters 200)'), ['class' => 'col-form-label'])); ?>
+                                    <?php echo e(Form::label('employee_remarks', __('Remarks (Maximum Characters 200)'), ['class' => 'col-form-label'])); ?>
 
-                                    <?php echo e(Form::textarea('remarks', null, ['class' => 'form-control', 'rows' => 3, 'id' => 'employee_remarks', 'placeholder' => 'Enter your remarks here when you clock out...', 'maxlength' => 200])); ?>
+                                    <?php echo e(Form::textarea('employee_remarks', null, ['class' => 'form-control', 'rows' => 3, 'id' => 'employee_remarks', 'placeholder' => 'Enter your remarks here when you clock out...', 'maxlength' => 200])); ?>
 
                                 </div>
                             <?php endif; ?>

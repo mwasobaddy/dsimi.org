@@ -290,7 +290,7 @@
             <!--timesheet-->
 
             <!-- performance-->
-            <?php if(Gate::check('Manage Indicator') || Gate::check('Manage Appraisal') || Gate::check('Manage Goal Tracking')): ?>
+            <?php if(Gate::check('Manage Indicator') || Gate::check('Manage Appraisal') || Gate::check('Manage Goal Tracking') || Gate::check('Show Indicator')): ?>
                 <li class="dash-item dash-hasmenu">
                     <a href="#!" class="dash-link"><span class="dash-micon"><i
                                 class="ti ti-3d-cube-sphere"></i></span><span
@@ -304,7 +304,7 @@
                             </li>
                         <?php endif; ?>
                         
-                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Manage Indicator')): ?>
+                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Manage Indicator')): ?> 
                             <li class="dash-item">
                                 <a class="dash-link" href="<?php echo e(route('indicator.index')); ?>"><?php echo e(__('Indicator')); ?></a>
                             </li>
@@ -315,6 +315,18 @@
                                 <a class="dash-link" href="<?php echo e(route('appraisal.index')); ?>"><?php echo e(__('Appraisal')); ?></a>
                             </li>
                         <?php endif; ?>
+                        
+                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Show Indicator')): ?> 
+                           <li class="dash-item">
+                               <a class="dash-link" href="<?php echo e(route('indicator.index')); ?>"><?php echo e(__('Indicator')); ?></a>
+                           </li>
+                       <?php endif; ?>
+
+                       <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Show Appraisal')): ?>
+                           <li class="dash-item">
+                               <a class="dash-link" href="<?php echo e(route('appraisal.index')); ?>"><?php echo e(__('Appraisal')); ?></a>
+                           </li>
+                       <?php endif; ?>
 
                        
                     </ul>

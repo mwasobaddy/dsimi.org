@@ -371,6 +371,7 @@ class AttendanceEmployeeController extends Controller
     public function update(Request $request, $id)
     {
         if (\Auth::user()->type == 'company' || \Auth::user()->type == 'hr') {
+            
             $employeeId      = AttendanceEmployee::where('employee_id', $request->employee_id)->first();
             $check = AttendanceEmployee::where('id', '=', $id)->where('employee_id', '=', $request->employee_id)->where('date', $request->date)->first();
 
@@ -429,39 +430,60 @@ class AttendanceEmployeeController extends Controller
 
         $startTime = Utility::getValByName('company_start_time');
         $endTime   = Utility::getValByName('company_end_time');
-        if (Auth::user()->type == 'employee') {
+        if (Auth::user()->type == 'employee' || Auth::user()->type == 'Line Manager (Employee)') {
+            
+            $request->validate([
+                'employee_remarks' => 'nullable|string|max:200',
+            ]);
+        
+            // First verify the attendance record exists
+            $attendance = AttendanceEmployee::where('employee_id', $employeeId)
+            ->orderBy('created_at', 'desc') // Order by the creation date
+            ->first();
 
+            if (!$attendance) {
+                return redirect()->route('dashboard')->with('error', __('Attendance record not found.'));
+            }
+        
             $date = date("Y-m-d");
             $time = date("H:i:s");
-
-            //early Leaving
+        
+            // Early Leaving calculation
             $totalEarlyLeavingSeconds = strtotime($date . $endTime) - time();
-            $hours                    = floor($totalEarlyLeavingSeconds / 3600);
-            $mins                     = floor($totalEarlyLeavingSeconds / 60 % 60);
-            $secs                     = floor($totalEarlyLeavingSeconds % 60);
-            $earlyLeaving             = sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
-
+            $hours = floor($totalEarlyLeavingSeconds / 3600);
+            $mins = floor($totalEarlyLeavingSeconds / 60 % 60);
+            $secs = floor($totalEarlyLeavingSeconds % 60);
+            $earlyLeaving = sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
+        
+            // Overtime calculation
             if (time() > strtotime($date . $endTime)) {
-                //Overtime
                 $totalOvertimeSeconds = time() - strtotime($date . $endTime);
-                $hours                = floor($totalOvertimeSeconds / 3600);
-                $mins                 = floor($totalOvertimeSeconds / 60 % 60);
-                $secs                 = floor($totalOvertimeSeconds % 60);
-                $overtime             = sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
+                $hours = floor($totalOvertimeSeconds / 3600);
+                $mins = floor($totalOvertimeSeconds / 60 % 60);
+                $secs = floor($totalOvertimeSeconds % 60);
+                $overtime = sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
             } else {
                 $overtime = '00:00:00';
             }
-
-            $attendanceEmployee['clock_out']     = $time;
-            $attendanceEmployee['early_leaving'] = $earlyLeaving;
-            $attendanceEmployee['overtime']      = $overtime;
-
+        
+            // Update using direct object property assignment
+            $attendance->clock_out = $time;
+            $attendance->early_leaving = $earlyLeaving;
+            $attendance->overtime = $overtime;
+            $attendance->employee_remarks = $request->employee_remarks;
+        
             if (!empty($request->date)) {
-                $attendanceEmployee['date']       =  $request->date;
+                $attendance->date = $request->date;
             }
-            AttendanceEmployee::where('id', $id)->update($attendanceEmployee);
-
-            return redirect()->route('dashboard')->with('success', __('Employee successfully clock Out.'));
+        
+            // Save the changes
+            $success = $attendance->save();
+        
+            if ($success) {
+                return redirect()->route('dashboard')->with('success', __('Employee successfully clocked out.'));
+            } else {
+                return redirect()->route('dashboard')->with('error', __('Error updating attendance record.'));
+            }
         } else {
             $date = date("Y-m-d");
             $clockout_time = date("H:i:s");
@@ -493,12 +515,12 @@ class AttendanceEmployeeController extends Controller
                 $overtime = '00:00:00';
             }
 
-            $attendanceEmployee                = AttendanceEmployee::find($id);
-            $attendanceEmployee->clock_out     = $clockout_time;
-            $attendanceEmployee->late          = $late;
-            $attendanceEmployee->early_leaving = $earlyLeaving;
-            $attendanceEmployee->overtime      = $overtime;
-            $attendanceEmployee->total_rest    = '00:00:00';
+            $attendanceEmployee                       = AttendanceEmployee::find($id);
+            $attendanceEmployee->clock_out            = $clockout_time;
+            $attendanceEmployee->late                 = $late;
+            $attendanceEmployee->early_leaving        = $earlyLeaving;
+            $attendanceEmployee->overtime             = $overtime;
+            $attendanceEmployee->total_rest           = '00:00:00';
 
             $attendanceEmployee->save();
 
