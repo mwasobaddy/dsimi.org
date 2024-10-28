@@ -1,4 +1,4 @@
-@php
+<?php
     $logo = \App\Models\Utility::get_file('uploads/logo/');
     $company_favicon = \App\Models\Utility::getValByName('company_favicon');
     $company_logo = \App\Models\Utility::GetLogo();
@@ -18,39 +18,40 @@
     } else {
         $themeColor = $color;
     }
-@endphp
+?>
 
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ $SITE_RTL == 'on' ? 'rtl' : '' }}">
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>" dir="<?php echo e($SITE_RTL == 'on' ? 'rtl' : ''); ?>">
 
 <head>
 
     <title>
-        {{ \App\Models\Utility::getValByName('title_text') ? \App\Models\Utility::getValByName('title_text') : config('app.name', 'DSIMI') }}
-        - @yield('page-title')</title>
+        <?php echo e(\App\Models\Utility::getValByName('title_text') ? \App\Models\Utility::getValByName('title_text') : config('app.name', 'DSIMI')); ?>
+
+        - <?php echo $__env->yieldContent('page-title'); ?></title>
 
     <!-- SEO META -->
-    <meta name="title" content="{{ $metatitle }}">
-    <meta name="description" content="{{ $metadesc }}">
+    <meta name="title" content="<?php echo e($metatitle); ?>">
+    <meta name="description" content="<?php echo e($metadesc); ?>">
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ env('APP_URL') }}">
-    <meta property="og:title" content="{{ $metatitle }}">
-    <meta property="og:description" content="{{ $metadesc }}">
+    <meta property="og:url" content="<?php echo e(env('APP_URL')); ?>">
+    <meta property="og:title" content="<?php echo e($metatitle); ?>">
+    <meta property="og:description" content="<?php echo e($metadesc); ?>">
     <meta property="og:image"
-        content="{{ isset($meta_logo) && !empty(asset('storage/uploads/meta/' . $meta_logo)) ? asset('storage/uploads/meta/' . $meta_logo) : 'hrmgo.png' }}">
+        content="<?php echo e(isset($meta_logo) && !empty(asset('storage/uploads/meta/' . $meta_logo)) ? asset('storage/uploads/meta/' . $meta_logo) : 'hrmgo.png'); ?>">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ env('APP_URL') }}">
-    <meta property="twitter:title" content="{{ $metatitle }}">
-    <meta property="twitter:description" content="{{ $metadesc }}">
+    <meta property="twitter:url" content="<?php echo e(env('APP_URL')); ?>">
+    <meta property="twitter:title" content="<?php echo e($metatitle); ?>">
+    <meta property="twitter:description" content="<?php echo e($metadesc); ?>">
     <meta property="twitter:image"
-        content="{{ isset($meta_logo) && !empty(asset('storage/uploads/meta/' . $meta_logo)) ? asset('storage/uploads/meta/' . $meta_logo) : 'hrmgo.png' }}">
+        content="<?php echo e(isset($meta_logo) && !empty(asset('storage/uploads/meta/' . $meta_logo)) ? asset('storage/uploads/meta/' . $meta_logo) : 'hrmgo.png'); ?>">
 
 
     <meta charset="utf-8" />
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="description" content="Dashboard Template Description" />
@@ -60,61 +61,61 @@
 
     <!-- Favicon icon -->
     <link rel="icon"
-        href="{{ $logo . '/' . (isset($company_favicon) && !empty($company_favicon) ? $company_favicon . '?' . time() : 'favicon.png' . '?' . time()) }}"
+        href="<?php echo e($logo . '/' . (isset($company_favicon) && !empty($company_favicon) ? $company_favicon . '?' . time() : 'favicon.png' . '?' . time())); ?>"
         type="image/x-icon" />
     <!-- for calendar-->
-    <link rel="stylesheet" href="{{ asset('assets/css/plugins/main.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/css/plugins/main.css')); ?>">
 
-    <link rel="stylesheet" href="{{ asset('assets/css/plugins/datepicker-bs5.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/plugins/style.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/css/plugins/datepicker-bs5.min.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/css/plugins/style.css')); ?>">
     <!-- font css -->
-    <link rel="stylesheet" href="{{ asset('assets/css/plugins/bootstrap-switch-button.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/fonts/tabler-icons.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/fonts/feather.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/fonts/material.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/css/plugins/bootstrap-switch-button.min.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/fonts/tabler-icons.min.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/fonts/feather.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/fonts/fontawesome.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/fonts/material.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('css/custom.css')); ?>">
     
 
     <!-- vendor css -->
 
-    <link rel="stylesheet" href="{{ asset('assets/css/customizer.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/css/customizer.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('css/custom.css')); ?>">
 
 
-    @if ($SITE_RTL == 'on')
-        <link rel="stylesheet" href="{{ asset('assets/css/style-rtl.css') }}">
-    @endif
+    <?php if($SITE_RTL == 'on'): ?>
+        <link rel="stylesheet" href="<?php echo e(asset('assets/css/style-rtl.css')); ?>">
+    <?php endif; ?>
 
-    @if ($setting['cust_darklayout'] == 'on')
-        <link rel="stylesheet" href="{{ asset('assets/css/style-dark.css') }}">
-    @else
-        <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" id="main-style-link">
-    @endif
+    <?php if($setting['cust_darklayout'] == 'on'): ?>
+        <link rel="stylesheet" href="<?php echo e(asset('assets/css/style-dark.css')); ?>">
+    <?php else: ?>
+        <link rel="stylesheet" href="<?php echo e(asset('assets/css/style.css')); ?>" id="main-style-link">
+    <?php endif; ?>
 
-    <meta name="url" content="{{ url('') . '/' . config('chatify.routes.prefix') }}"
-        data-user="{{ Auth::user()->id }}">
+    <meta name="url" content="<?php echo e(url('') . '/' . config('chatify.routes.prefix')); ?>"
+        data-user="<?php echo e(Auth::user()->id); ?>">
 
     <link rel='stylesheet' href='https://unpkg.com/nprogress@0.2.0/nprogress.css' />
 
-    @if ($setting['cust_darklayout'] == 'on')
-        <link rel="stylesheet" href="{{ asset('assets/css/custom-dark.css') }}">
-    @endif
+    <?php if($setting['cust_darklayout'] == 'on'): ?>
+        <link rel="stylesheet" href="<?php echo e(asset('assets/css/custom-dark.css')); ?>">
+    <?php endif; ?>
 
     <style>
         :root {
             --color-customColor: <?=$color ?>;
         }
     </style>
-    <link rel="stylesheet" href="{{ asset('css/custom-color.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('css/custom-color.css')); ?>">
         <script src="https://code.tidio.co/b7ig8ovqgzgvpxwrkc50qbaplkp0pwpk.js" async></script>
 
-    @stack('css-page')
+    <?php echo $__env->yieldPushContent('css-page'); ?>
 </head>
 
 
 
-<body class="{{ $themeColor }}">
+<body class="<?php echo e($themeColor); ?>">
     <!-- [ Pre-loader ] start -->
     <div class="loader-bg">
         <div class="loader-track">
@@ -123,11 +124,11 @@
     </div>
     <!-- [ Pre-loader ] End -->
     <!-- [ navigation menu ] start -->
-    @include('partial.Admin.menu')
+    <?php echo $__env->make('partial.Admin.menu', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
     <!-- [ navigation menu ] end -->
     <!-- [ Header ] start -->
 
-    @include('partial.Admin.header')
+    <?php echo $__env->make('partial.Admin.header', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
     <!-- Modal -->
     <div class="modal notification-modal fade" id="notification-modal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -202,17 +203,17 @@
                         <div class="col-auto">
                             <div class="page-header-title">
                                 <h4 class="m-b-10">
-                                    @yield('page-title')
+                                    <?php echo $__env->yieldContent('page-title'); ?>
                                 </h4>
                             </div>
                             <ul class="breadcrumb">
-                                @yield('breadcrumb')
+                                <?php echo $__env->yieldContent('breadcrumb'); ?>
                             </ul>
                         </div>
                         <div class="col-sm-auto col-md">
                             <div class="float-end "
-                                @if ($SITE_RTL == 'on') style=" float: left !important;" @endif>
-                                @yield('action-button')
+                                <?php if($SITE_RTL == 'on'): ?> style=" float: left !important;" <?php endif; ?>>
+                                <?php echo $__env->yieldContent('action-button'); ?>
                             </div>
 
                         </div>
@@ -223,7 +224,7 @@
             <!-- [ breadcrumb ] end -->
             <!-- [ Main Content ] start -->
             <!-- [ basic-table ] start -->
-            @yield('content')
+            <?php echo $__env->yieldContent('content'); ?>
             <!-- [ basic-table ] end -->
             <!-- [ Main Content ] end -->
         </div>
@@ -270,12 +271,14 @@
         <div class="footer-wrapper">
             <div class="py-1">
                 <span class="text-muted">
-                    @if (empty(App\Models\Utility::getValByName('footer_text')))
-                        &copy;{{ date(' Y') }}
-                    @endif
-                    {{ App\Models\Utility::getValByName('footer_text') ? App\Models\Utility::getValByName('footer_text') : config('app.name', 'DSIMI') }}
+                    <?php if(empty(App\Models\Utility::getValByName('footer_text'))): ?>
+                        &copy;<?php echo e(date(' Y')); ?>
 
-                    {{-- {{ \App\Models\Utility::getValByName('footer_text') ? \App\Models\Utility::getValByName('footer_text') : '©Copyright DSIMI' . date(' Y') }} --}}
+                    <?php endif; ?>
+                    <?php echo e(App\Models\Utility::getValByName('footer_text') ? App\Models\Utility::getValByName('footer_text') : config('app.name', 'DSIMI')); ?>
+
+
+                    
 
                 </span>
             </div>
@@ -289,34 +292,30 @@
 <![endif]-->
     <!-- Warning Section Ends -->
     <!-- Required Js -->
-    <script src="{{ asset('assets/js/plugins/choices.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.form.js') }}"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/choices.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('js/jquery.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('js/jquery.form.js')); ?>"></script>
 
-    <script src="{{ asset('js/letter.avatar.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/datepicker-full.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/popper.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/simplebar.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/perfect-scrollbar.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/feather.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/bootstrap-switch-button.min.js') }}"></script>
-    <script src="{{ asset('assets/js/dash.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/sweetalert2.all.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/simple-datatables.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/flatpickr.min.js') }}"></script>
+    <script src="<?php echo e(asset('js/letter.avatar.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/datepicker-full.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/popper.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/simplebar.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/perfect-scrollbar.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/bootstrap.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/feather.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/bootstrap-switch-button.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/js/dash.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/sweetalert2.all.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/simple-datatables.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/js/plugins/flatpickr.min.js')); ?>"></script>
 
-    <script src="{{ asset('js/custom.js') }}"></script>
+    <script src="<?php echo e(asset('js/custom.js')); ?>"></script>
 
-    <script src="{{ asset('js/chatify/autosize.js') }}"></script>
+    <script src="<?php echo e(asset('js/chatify/autosize.js')); ?>"></script>
     <script src='https://unpkg.com/nprogress@0.2.0/nprogress.js'></script>
 
 
-    {{-- <script>
-        if($("#pc-dt-simple").lenght > 0) {
-            const dataTable = new simpleDatatables.DataTable("#pc-dt-simple");
-        }
-    </script> --}}
+    
 
     <script>
         const dataTable = new simpleDatatables.DataTable("#pc-dt-simple");
@@ -368,17 +367,17 @@
             if (custdarklayout.checked) {
                 document
                     .querySelector("#main-style-link")
-                    .setAttribute("href", "{{ asset('assets/css/style-dark.css') }}");
+                    .setAttribute("href", "<?php echo e(asset('assets/css/style-dark.css')); ?>");
                 document
                     .querySelector(".m-header > .b-brand > .logo-lg")
-                    .setAttribute("src", "{{ asset('/storage/uploads/logo/logo-light.png') }}");
+                    .setAttribute("src", "<?php echo e(asset('/storage/uploads/logo/logo-light.png')); ?>");
             } else {
                 document
                     .querySelector("#main-style-link")
-                    .setAttribute("href", "{{ asset('assets/css/style.css') }}");
+                    .setAttribute("href", "<?php echo e(asset('assets/css/style.css')); ?>");
                 document
                     .querySelector(".m-header > .b-brand > .logo-lg")
-                    .setAttribute("src", "{{ asset('/storage/uploads/logo/logo-dark.png') }}");
+                    .setAttribute("src", "<?php echo e(asset('/storage/uploads/logo/logo-dark.png')); ?>");
             }
         });
 
@@ -435,12 +434,12 @@
 
     <script src="https://js.pusher.com/5.0/pusher.min.js"></script>
 
-    @if (\App\Models\Utility::getValByName('gdpr_cookie') == 'on')
+    <?php if(\App\Models\Utility::getValByName('gdpr_cookie') == 'on'): ?>
         <script type="text/javascript">
             var defaults = {
                 'messageLocales': {
                     /*'en': 'We use cookies to make sure you can have the best experience on our website. If you continue to use this site we assume that you will be happy with it.'*/
-                    'en': "{{ \App\Models\Utility::getValByName('cookie_text') }}"
+                    'en': "<?php echo e(\App\Models\Utility::getValByName('cookie_text')); ?>"
                 },
                 'buttonLocales': {
                     'en': 'Ok'
@@ -465,13 +464,13 @@
                 'linkColor': '#009fdd'
             };
         </script>
-        <script src="{{ asset('js/cookie.notice.js') }}"></script>
-    @endif
+        <script src="<?php echo e(asset('js/cookie.notice.js')); ?>"></script>
+    <?php endif; ?>
 
-    @if (\Auth::user()->type != 'super admin')
+    <?php if(\Auth::user()->type != 'super admin'): ?>
         <script>
             $(document).ready(function() {
-                pushNotification('{{ Auth::id() }}');
+                pushNotification('<?php echo e(Auth::id()); ?>');
             });
 
             function pushNotification(id) {
@@ -486,8 +485,8 @@
                 // Enable pusher logging - don't include this in production
                 Pusher.logToConsole = false;
 
-                var pusher = new Pusher('{{ $pusher_setting['pusher_app_key'] }}', {
-                    cluster: '{{ $pusher_setting['pusher_app_cluster'] }}',
+                var pusher = new Pusher('<?php echo e($pusher_setting['pusher_app_key']); ?>', {
+                    cluster: '<?php echo e($pusher_setting['pusher_app_cluster']); ?>',
                     forceTLS: true
                 });
 
@@ -512,31 +511,32 @@
 
             // Get chat for top ox
         </script>
-    @endif
+    <?php endif; ?>
 
 
-    @if ($message = Session::get('success'))
+    <?php if($message = Session::get('success')): ?>
         <script>
-            show_toastr('Success', '{!! $message !!}', 'success');
+            show_toastr('Success', '<?php echo $message; ?>', 'success');
         </script>
-    @endif
-    @if ($message = Session::get('error'))
+    <?php endif; ?>
+    <?php if($message = Session::get('error')): ?>
         <script>
-            show_toastr('Error', '{!! $message !!}', 'error');
+            show_toastr('Error', '<?php echo $message; ?>', 'error');
         </script>
-    @endif
+    <?php endif; ?>
 
 
-    @stack('script-page')
+    <?php echo $__env->yieldPushContent('script-page'); ?>
 
-    @stack('scripts')
-    @include('Chatify::layouts.footerLinks')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
+    <?php echo $__env->make('Chatify::layouts.footerLinks', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 
-    @stack('custom-scripts')
-    @if ($enable_cookie['enable_cookie'] == 'on')
-        @include('layouts.cookie_consent')
-    @endif
+    <?php echo $__env->yieldPushContent('custom-scripts'); ?>
+    <?php if($enable_cookie['enable_cookie'] == 'on'): ?>
+        <?php echo $__env->make('layouts.cookie_consent', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php endif; ?>
 
 </body>
 
 </html>
+<?php /**PATH C:\XAMPP\htdocs\hrnew\dsimi.org\resources\views/layouts/admin.blade.php ENDPATH**/ ?>

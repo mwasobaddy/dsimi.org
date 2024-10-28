@@ -262,6 +262,9 @@
                             </li>
 
                         @endcan
+                        <li class="dash-item">
+                            <a class="dash-link" href="{{ route('hpermissions.index') }}">{{ __('Hourly Permission Requests') }}</a>
+                        </li>
                         @can('Manage Attendance')
                             <li class="dash-item dash-hasmenu">
                                 <a href="#!" class="dash-link"><span

@@ -85,6 +85,7 @@ class JobController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
 
+            
             $job                       = new Job();
             $job->title                = $request->title;
             $job->branch               = $request->branch;

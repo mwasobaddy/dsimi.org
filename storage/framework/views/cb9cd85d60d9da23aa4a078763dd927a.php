@@ -979,4 +979,4 @@ href="<?php echo e(route('competencies.index')); ?>"><?php echo e(__('Competenci
 </div>
 </div>
 </nav>
-<?php /**PATH C:\xampp\htdocs\dsimi.org\resources\views/partial/Admin/menu.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\XAMPP\htdocs\hrnew\dsimi.org\resources\views/partial/Admin/menu.blade.php ENDPATH**/ ?>
