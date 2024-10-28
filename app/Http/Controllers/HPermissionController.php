@@ -10,9 +10,18 @@ class HPermissionController extends Controller
 {
     public function index()
     {
-        $permissions = Permission::where('id', Auth::id())->get();
+        $permissions = Permission::where('user_id', Auth::user()->id)->get();
+
+        if ($permissions) {
+            // Pass the permissions data to the view and display the success message
+            return view('hpermissions.index', compact('permissions'))->with('success', 'Permission request submitted successfully.');
+        } else {
+            // Display the view with an error message
+            return view('hpermissions.index', compact('permissions'))->with('error', 'Permission error');
+        }
+        
         // $permissions = permission::all();
-        return view('hpermissions.index', compact('permissions'));
+        // return view('hpermissions.index', compact('permissions'));
     }
 
     public function create()
@@ -28,8 +37,9 @@ class HPermissionController extends Controller
             'reason' => 'nullable|string',
         ]);
     
+
         // Check for overlapping permission requests
-        $existingPermissions = Permission::where('id', Auth::id())
+        $existingPermissions = Permission::where('user_id', Auth::user()->id)
             ->where('request_date', $request->request_date)
             ->where(function ($query) use ($request) {
                 $query->whereBetween('start_time', [$request->start_time, $request->end_time])
@@ -43,7 +53,7 @@ class HPermissionController extends Controller
     
         try {
             Permission::create([
-                'id' => Auth::id(),
+                'user_id' => Auth::user()->id,
                 'request_date' => $request->request_date,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
