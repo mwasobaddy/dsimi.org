@@ -143,6 +143,7 @@ CREATE TABLE `attendance_employees` (
   `status` varchar(191) NOT NULL,
   `clock_in` time NOT NULL,
   `clock_out` time NOT NULL,
+  `employee_remarks` varchar(255) NOT NULL,
   `late` time NOT NULL,
   `early_leaving` time NOT NULL,
   `overtime` time NOT NULL,

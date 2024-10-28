@@ -835,6 +835,9 @@ Route::group(['middleware' => ['verified']], function () {
             'XSS',
         ]
     );
+    Route::get('leave/certificate/{id}/download', [LeaveController::class, 'downloadCertificate'])
+    ->name('leave.certificate.download');
+
     Route::post('leave/jsoncount', [LeaveController::class, 'jsoncount'])->name('leave.jsoncount')->middleware(
         [
             'auth',

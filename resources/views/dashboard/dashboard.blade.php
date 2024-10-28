@@ -17,6 +17,77 @@
 
 
         @if (\Auth::user()->type == 'employee')
+        <div class="col-xxl-6">
+            <div class="card" style="height: fit-content;">
+                <div class="card-header">
+                    <h5>{{ __('Mark Attandance') }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted pb-0-5">
+                        {{ __('My Office Time: ' . $officeTime['startTime'] . ' to ' . $officeTime['endTime']) }}
+                    </p>
+                    <div class="row">
+                        {{ Form::open(['url' => 'attendanceemployee/attendance', 'method' => 'post', 'class' => 'd-flex flex-column align-items-center']) }}
+                            @if (!empty($employeeAttendance) && $employeeAttendance->clock_out == '00:00:00')
+                                <div class="form-group col-lg-8 col-md-8">
+                                    {{ Form::label('remarks', __('Remarks (Maximum Characters 200)'), ['class' => 'col-form-label']) }}
+                                    {{ Form::textarea('remarks', null, ['class' => 'form-control', 'rows' => 3, 'id' => 'employee_remarks', 'placeholder' => 'Enter your remarks here when you clock out...', 'maxlength' => 200]) }}
+                                </div>
+                            @endif
+                            <div class="row w-100">
+                                <div class="col-md-6 float-right border-right d-flex justify-content-center">
+                                    @if (empty($employeeAttendance) || $employeeAttendance->clock_out != '00:00:00')
+                                        <button type="submit" value="0" name="in" id="clock_in"
+                                            class="btn btn-primary">{{ __('CLOCK IN') }}</button>
+                                    @else
+                                        <button type="submit" value="0" name="in" id="clock_in"
+                                            class="btn btn-primary disabled" disabled>{{ __('CLOCK IN') }}</button>
+                                    @endif
+                                </div>
+                                <div class="col-md-6 float-left d-flex justify-content-center">
+                                    @if (!empty($employeeAttendance) && $employeeAttendance->clock_out == '00:00:00')
+                                        {{ Form::model($employeeAttendance, ['route' => ['attendanceemployee.update', $employeeAttendance->id], 'method' => 'PUT']) }}
+                                        <button type="submit" value="1" name="out" id="clock_out"
+                                            class="btn btn-danger">{{ __('CLOCK OUT') }}</button>
+                                    @else
+                                        <button type="submit" value="1" name="out" id="clock_out"
+                                            class="btn btn-danger disabled" disabled>{{ __('CLOCK OUT') }}</button>
+                                    @endif
+                                </div>
+                            </div>
+                                
+                        {{ Form::close() }}
+                    </div>
+                </div>
+            </div>
+            <div class="card" style="height: 402px;">
+                <div class="card-header card-body table-border-style">
+                    <h5>{{ __('Meeting schedule') }}</h5>
+                </div>
+                <div class="card-body" style="height: 320px">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('Meeting title') }}</th>
+                                    <th>{{ __('Meeting Date') }}</th>
+                                    <th>{{ __('Meeting Time') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="list">
+                                @foreach ($meetings as $meeting)
+                                    <tr>
+                                        <td>{{ $meeting->title }}</td>
+                                        <td>{{ \Auth::user()->dateFormat($meeting->date) }}</td>
+                                        <td>{{ \Auth::user()->timeFormat($meeting->time) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
             <div class="col-xxl-6">
                 <div class="card">
                     <div class="card-header">
@@ -42,68 +113,6 @@
                     </div>
                     <div class="card-body">
                         <div id='event_calendar' class='calendar'></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xxl-6">
-                <div class="card" style="height: 230px;">
-                    <div class="card-header">
-                        <h5>{{ __('Mark Attandance') }}</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted pb-0-5">
-                            {{ __('My Office Time: ' . $officeTime['startTime'] . ' to ' . $officeTime['endTime']) }}</p>
-                        <div class="row">
-                            <div class="col-md-6 float-right border-right">
-                                {{ Form::open(['url' => 'attendanceemployee/attendance', 'method' => 'post']) }}
-                                @if (empty($employeeAttendance) || $employeeAttendance->clock_out != '00:00:00')
-                                    <button type="submit" value="0" name="in" id="clock_in"
-                                        class="btn btn-primary">{{ __('CLOCK IN') }}</button>
-                                @else
-                                    <button type="submit" value="0" name="in" id="clock_in"
-                                        class="btn btn-primary disabled" disabled>{{ __('CLOCK IN') }}</button>
-                                @endif
-                                {{ Form::close() }}
-                            </div>
-                            <div class="col-md-6 float-left">
-                                @if (!empty($employeeAttendance) && $employeeAttendance->clock_out == '00:00:00')
-                                    {{ Form::model($employeeAttendance, ['route' => ['attendanceemployee.update', $employeeAttendance->id], 'method' => 'PUT']) }}
-                                    <button type="submit" value="1" name="out" id="clock_out"
-                                        class="btn btn-danger">{{ __('CLOCK OUT') }}</button>
-                                @else
-                                    <button type="submit" value="1" name="out" id="clock_out"
-                                        class="btn btn-danger disabled" disabled>{{ __('CLOCK OUT') }}</button>
-                                @endif
-                                {{ Form::close() }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card" style="height: 402px;">
-                    <div class="card-header card-body table-border-style">
-                        <h5>{{ __('Meeting schedule') }}</h5>
-                    </div>
-                    <div class="card-body" style="height: 320px">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>{{ __('Meeting title') }}</th>
-                                        <th>{{ __('Meeting Date') }}</th>
-                                        <th>{{ __('Meeting Time') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="list">
-                                    @foreach ($meetings as $meeting)
-                                        <tr>
-                                            <td>{{ $meeting->title }}</td>
-                                            <td>{{ \Auth::user()->dateFormat($meeting->date) }}</td>
-                                            <td>{{ \Auth::user()->timeFormat($meeting->time) }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -141,64 +150,45 @@
 
         @elseif(\Auth::user()->type == 'Line Manager (Employee)')
             <div class="col-xxl-6">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <h5>{{ __('Calendar') }}</h5>
-                                <input type="hidden" id="path_admin" value="{{ url('/') }}">
-                            </div>
-                            <div class="col-lg-6">
-                                {{-- <div class="form-group"> --}}
-                                <label for=""></label>
-                                @if (isset($setting['is_enabled']) && $setting['is_enabled'] == 'on')
-                                    <select class="form-control" name="calender_type" id="calender_type"
-                                        style="float: right;width: 155px;" onchange="get_data()">
-                                        <option value="google_calender">{{ __('Google Calendar') }}</option>
-                                        <option value="local_calender" selected="true">
-                                            {{ __('Local Calendar') }}</option>
-                                    </select>
-                                @endif
-                                {{-- </div> --}}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div id='event_calendar' class='calendar'></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xxl-6">
-                <div class="card" style="height: 230px;">
+                <div class="card" style="height: fit-content;">
                     <div class="card-header">
                         <h5>{{ __('Mark Attandance') }}</h5>
                     </div>
                     <div class="card-body">
                         <p class="text-muted pb-0-5">
-                            {{ __('My Office Time: ' . $officeTime['startTime'] . ' to ' . $officeTime['endTime']) }}</p>
+                            {{ __('My Office Time: ' . $officeTime['startTime'] . ' to ' . $officeTime['endTime']) }}
+                        </p>
                         <div class="row">
-                            <div class="col-md-6 float-right border-right">
-                                {{ Form::open(['url' => 'attendanceemployee/attendance', 'method' => 'post']) }}
-                                @if (empty($employeeAttendance) || $employeeAttendance->clock_out != '00:00:00')
-                                    <button type="submit" value="0" name="in" id="clock_in"
-                                        class="btn btn-primary">{{ __('CLOCK IN') }}</button>
-                                @else
-                                    <button type="submit" value="0" name="in" id="clock_in"
-                                        class="btn btn-primary disabled" disabled>{{ __('CLOCK IN') }}</button>
-                                @endif
-                                {{ Form::close() }}
-                            </div>
-                            <div class="col-md-6 float-left">
+                            {{ Form::open(['url' => 'attendanceemployee/attendance', 'method' => 'post', 'class' => 'd-flex flex-column align-items-center']) }}
                                 @if (!empty($employeeAttendance) && $employeeAttendance->clock_out == '00:00:00')
-                                    {{ Form::model($employeeAttendance, ['route' => ['attendanceemployee.update', $employeeAttendance->id], 'method' => 'PUT']) }}
-                                    <button type="submit" value="1" name="out" id="clock_out"
-                                        class="btn btn-danger">{{ __('CLOCK OUT') }}</button>
-                                @else
-                                    <button type="submit" value="1" name="out" id="clock_out"
-                                        class="btn btn-danger disabled" disabled>{{ __('CLOCK OUT') }}</button>
+                                    <div class="form-group col-lg-8 col-md-8">
+                                        {{ Form::label('remarks', __('Remarks (Maximum Characters 200)'), ['class' => 'col-form-label']) }}
+                                        {{ Form::textarea('remarks', null, ['class' => 'form-control', 'rows' => 3, 'id' => 'employee_remarks', 'placeholder' => 'Enter your remarks here when you clock out...', 'maxlength' => 200]) }}
+                                    </div>
                                 @endif
-                                {{ Form::close() }}
-                            </div>
+                                <div class="row w-100">
+                                    <div class="col-md-6 float-right border-right d-flex justify-content-center">
+                                        @if (empty($employeeAttendance) || $employeeAttendance->clock_out != '00:00:00')
+                                            <button type="submit" value="0" name="in" id="clock_in"
+                                                class="btn btn-primary">{{ __('CLOCK IN') }}</button>
+                                        @else
+                                            <button type="submit" value="0" name="in" id="clock_in"
+                                                class="btn btn-primary disabled" disabled>{{ __('CLOCK IN') }}</button>
+                                        @endif
+                                    </div>
+                                    <div class="col-md-6 float-left d-flex justify-content-center">
+                                        @if (!empty($employeeAttendance) && $employeeAttendance->clock_out == '00:00:00')
+                                            {{ Form::model($employeeAttendance, ['route' => ['attendanceemployee.update', $employeeAttendance->id], 'method' => 'PUT']) }}
+                                            <button type="submit" value="1" name="out" id="clock_out"
+                                                class="btn btn-danger">{{ __('CLOCK OUT') }}</button>
+                                        @else
+                                            <button type="submit" value="1" name="out" id="clock_out"
+                                                class="btn btn-danger disabled" disabled>{{ __('CLOCK OUT') }}</button>
+                                        @endif
+                                    </div>
+                                </div>
+                                    
+                            {{ Form::close() }}
                         </div>
                     </div>
                 </div>
@@ -227,6 +217,34 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xxl-6">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <h5>{{ __('Calendar') }}</h5>
+                                <input type="hidden" id="path_admin" value="{{ url('/') }}">
+                            </div>
+                            <div class="col-lg-6">
+                                {{-- <div class="form-group"> --}}
+                                <label for=""></label>
+                                @if (isset($setting['is_enabled']) && $setting['is_enabled'] == 'on')
+                                    <select class="form-control" name="calender_type" id="calender_type"
+                                        style="float: right;width: 155px;" onchange="get_data()">
+                                        <option value="google_calender">{{ __('Google Calendar') }}</option>
+                                        <option value="local_calender" selected="true">
+                                            {{ __('Local Calendar') }}</option>
+                                    </select>
+                                @endif
+                                {{-- </div> --}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id='event_calendar' class='calendar'></div>
                     </div>
                 </div>
             </div>

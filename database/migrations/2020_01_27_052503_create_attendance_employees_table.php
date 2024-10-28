@@ -20,6 +20,7 @@ class CreateAttendanceEmployeesTable extends Migration
             $table->string('status');
             $table->time('clock_in');
             $table->time('clock_out');
+            $table->varchar('employee_remarks');
             $table->time('late');
             $table->time('early_leaving');
             $table->time('overtime');

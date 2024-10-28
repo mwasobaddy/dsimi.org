@@ -12,6 +12,7 @@ class AttendanceEmployee extends Model
         'status',
         'clock_in',
         'clock_out',
+        'employee_remarks',
         'late',
         'early_leaving',
         'overtime',

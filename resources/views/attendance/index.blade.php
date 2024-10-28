@@ -194,6 +194,7 @@
                                     <th>{{ __('Status') }}</th>
                                     <th>{{ __('Clock In') }}</th>
                                     <th>{{ __('Clock Out') }}</th>
+                                    <th>{{ __('Employees Remarks') }}</th>
                                     <th>{{ __('Late') }}</th>
                                     <th>{{ __('Early Leaving') }}</th>
                                     <th>{{ __('Overtime') }}</th>
@@ -214,6 +215,7 @@
                                         </td>
                                         <td>{{ $attendance->clock_out != '00:00:00' ? \Auth::user()->timeFormat($attendance->clock_out) : '00:00' }}
                                         </td>
+                                        <td>{{ $attendance->employee_remarks }}</td>
                                         <td>{{ $attendance->late }}</td>
                                         <td>{{ $attendance->early_leaving }}</td>
                                         <td>{{ $attendance->overtime }}</td>
