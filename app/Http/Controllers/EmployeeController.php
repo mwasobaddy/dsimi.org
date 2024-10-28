@@ -30,6 +30,7 @@ use App\Models\PaySlip;
 use App\Models\Termination;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
 
 //use Faker\Provider\File;
 
@@ -39,7 +40,33 @@ class EmployeeController extends Controller
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
-     */
+    */
+
+    
+public function showEmployeeSupervise()
+{
+    if(Auth::user()->can('Manage Employee'))
+    {
+        $currentEmployee = Employee::where('user_id', Auth::user()->id)->first();
+        
+        if (!$currentEmployee) {
+            return redirect()->back()->with('error', __('Employee not found.'));
+        }
+
+        $employees = Employee::where(function($query) use ($currentEmployee) {
+            $query->where('supervisor_n1', $currentEmployee->name)
+                  ->orWhere('supervisor_n2', $currentEmployee->name);
+        })->get();
+
+        return view('employee.show_employee_supervise', compact('employees', 'currentEmployee'));
+    }
+    else
+    {
+        return redirect()->back()->with('error', __('Permission denied.'));
+    }
+}
+
+
     public function index()
     {
 
@@ -85,7 +112,7 @@ class EmployeeController extends Controller
                 'gender' => 'required',
                 'phone' => 'required',
                 'address' => 'required',
-                'email' => 'required|unique:users',
+                'email' => 'required',
                 'password' => 'required',
                 'branch_id' => 'required',
                 'department_id' => 'required',
@@ -151,12 +178,19 @@ class EmployeeController extends Controller
 
             if ($total_employee < $plan->max_employees || $plan->max_employees == -1) {
 
+                $db_user_role = $request['role'];
+
+                if ($db_user_role === 'Agent (Employee)') {
+                    $db_user_role = 'employee'; // Use '=' for assignment
+                }
+
+
                 $user = User::create(
                     [
                         'name' => $request['first_name'] . ' ' . $request['last_name'],
                         'email' => $request['email'],
                         'password' => Hash::make($request['password']),
-                        'type' => 'employee',
+                        'type' => $db_user_role,
                         'lang' => !empty($default_language) ? $default_language->value : 'en',
                         'created_by' => \Auth::user()->creatorId(),
                         'email_verified_at' => $date,
@@ -175,6 +209,7 @@ class EmployeeController extends Controller
                 $document_implode = null;
             }
 
+<<<<<<< HEAD
         // // Create the user first
         // $user = User::create([
         //     'name' => $request['first_name'] . ' ' . $request['last_name'],
@@ -185,6 +220,20 @@ class EmployeeController extends Controller
         //     'created_by' => \Auth::user()->creatorId(),
         //     'email_verified_at' => now(), // Make sure $date is defined or use 'now()'
         // ]);
+=======
+
+           
+
+                                        
+            $db_emp_role = $request['role'];
+
+            if ($db_emp_role === 'Agent (Employee)') {
+                $db_emp_role = 'Agent'; // Use '=' for assignment
+            }
+
+
+            
+>>>>>>> 742ae9a08c58f457cbc59ddd73680f2df21fbeea
             $employee = Employee::create(
                 [
                     'user_id' => $user->id,
@@ -221,11 +270,16 @@ class EmployeeController extends Controller
                     'grade' => $request['grade'],
                     'supervisor_n1' => $request['supervisor_n1'],
                     'supervisor_n2' => $request['supervisor_n2'],
-                    'role' => $request['role'],
+                    'role' => $db_emp_role,
                     'created_by' => \Auth::user()->creatorId(),
                 ]
             );
            
+
+
+
+
+
 
             if ($request->hasFile('document')) {
                 foreach ($request->document as $key => $document) {
@@ -697,7 +751,7 @@ class EmployeeController extends Controller
         $objUser = \Auth::user();
 
         $usersList = User::where('created_by', '=', $objUser->creatorId())
-            ->whereNotIn('type', ['super admin', 'company'])->get()->pluck('name', 'id');
+            ->whereNotIn('type', ['super admin', 'company', 'Administrator (Employee)'])->get()->pluck('name', 'id');
         $usersList->prepend('All', '');
         if ($request->month == null) {
             $userdetails = DB::table('login_details')

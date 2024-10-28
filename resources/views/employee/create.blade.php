@@ -311,10 +311,9 @@
                                         {{ Form::label('role', __('Rôle*'), ['class' => 'form-label']) }}
                                         <div class="form-icon-user">
                                             {{ Form::select('role', [
-                                                'Responsable Hiérarchique' => 'Responsable Hiérarchique',
-                                                'Agent' => 'Agent',
-                                                'Administrator (Employee)' => 'Administrator (Employee)',
+                                                'Agent (Employee)' => 'Agent (Employee)',
                                                 'Line Manager (Employee)' => 'Line Manager (Employee)',
+                                                'Administrator (Employee)' => 'Administrator (Employee)',
                                             ], null, [
                                                 'class' => 'form-control role', 
                                                 'required' => 'required', 

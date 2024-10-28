@@ -39,23 +39,30 @@ class HomeController extends Controller
     {
 
         if (Auth::check()) {
-		$user = Auth::user();
+		    $user = Auth::user();
 		
             if ($user->type =='employee') {
                 $emp = Employee::where('user_id', '=', $user->id)->first();
 
+                //anouncements
                 $announcements = Announcement::orderBy('announcements.id', 'desc')->take(5)->leftjoin('announcement_employees', 'announcements.id', '=', 'announcement_employees.announcement_id')->where('announcement_employees.employee_id', '=', $emp->id)->orWhere(
                     function ($q) {
                         $q->where('announcements.department_id', 0)->where('announcements.employee_id', 0);
                     }
                 )->get();
 
+                //employees
                 $employees = Employee::get();
+
+                //meetings
                 $meetings  = Meeting::orderBy('meetings.id', 'desc')->take(5)->leftjoin('meeting_employees', 'meetings.id', '=', 'meeting_employees.meeting_id')->where('meeting_employees.employee_id', '=', $emp->id)->orWhere(
                     function ($q) {
                         $q->where('meetings.department_id', 0)->where('meetings.employee_id', 0);
                     }
                 )->get();
+
+
+                //events
                 $events    = Event::select('events.*', 'events.id as event_id', 'event_employees.*')->leftjoin('event_employees', 'events.id', '=', 'event_employees.event_id')->where('event_employees.employee_id', '=', $emp->id)->orWhere(
                     function ($q) {
                         $q->where('events.department_id', 0)->where('events.employee_id', 0);
@@ -78,15 +85,70 @@ class HomeController extends Controller
                     $arrEvents[]            = $arr;
                 }
 
+                //attendance
                 $date               = date("Y-m-d");
                 $time               = date("H:i:s");
                 $employeeAttendance = AttendanceEmployee::orderBy('id', 'desc')->where('employee_id', '=', !empty(\Auth::user()->employee) ? \Auth::user()->employee->id : 0)->where('date', '=', $date)->first();
 
+
+                //start and end time
                 $officeTime['startTime'] = Utility::getValByName('company_start_time');
                 $officeTime['endTime']   = Utility::getValByName('company_end_time');
 
                 return view('dashboard.dashboard', compact('arrEvents', 'announcements', 'employees', 'meetings', 'employeeAttendance', 'officeTime'));
-            } else if ($user->type == 'super admin') {
+            }  
+            else if ($user->type == 'Line Manager (Employee)'){
+                $emp = Employee::where('user_id', '=', $user->id)->first();
+
+
+                //events
+                $events    = Event::select('events.*', 'events.id as event_id', 'event_employees.*')->leftjoin('event_employees', 'events.id', '=', 'event_employees.event_id')->where('event_employees.employee_id', '=', $emp->id)->orWhere(
+                    function ($q) {
+                        $q->where('events.department_id', 0)->where('events.employee_id', 0);
+                    }
+                )->get();
+                $arrEvents = [];
+
+                //anouncements
+                $announcements = Announcement::orderBy('announcements.id', 'desc')->take(5)->leftjoin('announcement_employees', 'announcements.id', '=', 'announcement_employees.announcement_id')->where('announcement_employees.employee_id', '=', $emp->id)->orWhere(
+                    function ($q) {
+                        $q->where('announcements.department_id', 0)->where('announcements.employee_id', 0);
+                    }
+                )->get();
+
+                //employees
+                $employees = Employee::where('supervisor_n1', '=', $emp->name)
+                ->orwhere('supervisor_n2', '=', $emp->name)
+                ->get();
+                $countEmployee = count($employees);
+                
+                //check absentees
+                $currentDate = date('Y-m-d');
+                $notClockIn    = AttendanceEmployee::where('date', '=', $currentDate)->get()->pluck('employee_id');
+                $notClockIns = Employee::where('supervisor_n1', '=', $emp->name)
+                ->orWhere('supervisor_n2', '=', $emp->name)
+                ->whereNotIn('id', $notClockIn)->get();
+
+                //meetings
+                $meetings  = Meeting::orderBy('meetings.id', 'desc')->take(5)->leftjoin('meeting_employees', 'meetings.id', '=', 'meeting_employees.meeting_id')->where('meeting_employees.employee_id', '=', $emp->id)->orWhere(
+                    function ($q) {
+                        $q->where('meetings.department_id', 0)->where('meetings.employee_id', 0);
+                    }
+                )->get();
+
+                //attendance
+                $date               = date("Y-m-d");
+                $time               = date("H:i:s");
+                $employeeAttendance = AttendanceEmployee::orderBy('id', 'desc')->where('employee_id', '=', !empty(\Auth::user()->employee) ? \Auth::user()->employee->id : 0)->where('date', '=', $date)->first();
+
+
+                //start and end time
+                $officeTime['startTime'] = Utility::getValByName('company_start_time');
+                $officeTime['endTime']   = Utility::getValByName('company_end_time');
+
+                return view('dashboard.dashboard', compact('arrEvents', 'announcements', 'employees', 'meetings', 'countEmployee', 'notClockIns', 'employeeAttendance', 'officeTime'));
+            }
+            else if ($user->type == 'super admin') {
                 $user                       = \Auth::user();
                 $user['total_user']         = $user->countCompany();
                 $user['total_paid_user']    = $user->countPaidCompany();
@@ -97,8 +159,14 @@ class HomeController extends Controller
 
                 $chartData = $this->getOrderChart(['duration' => 'week']);
 
+<<<<<<< HEAD
                 return view('dashboard.super_admin', compact('user', 'chartData'));
             } else {
+=======
+                return view('dashboard.admin', compact('user', 'chartData'));
+            } 
+            else {
+>>>>>>> 742ae9a08c58f457cbc59ddd73680f2df21fbeea
 
                 $events    = Event::where('created_by', '=', \Auth::user()->creatorId())->get();
                 $arrEvents = [];
@@ -114,7 +182,7 @@ class HomeController extends Controller
                     $arr['url']             = route('event.edit', $event['id']);
 
                     $arrEvents[] = $arr;
-		}
+		        }
 		
 
                 $announcements = Announcement::orderBy('announcements.id', 'desc')->take(5)->where('created_by', '=', \Auth::user()->creatorId())->get();

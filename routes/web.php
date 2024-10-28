@@ -402,6 +402,12 @@ Route::group(['middleware' => ['verified']], function () {
             'XSS',
         ]
     );
+    Route::get('show-employee-supervise', [EmployeeController::class, 'showEmployeeSupervise'])
+    ->name('show_employee_supervise.showall')
+    ->middleware([
+        'auth',
+        'XSS',
+    ]);
     Route::get('lastlogin', [EmployeeController::class, 'lastLogin'])->name('lastlogin')->middleware(
         [
             'auth',
@@ -869,6 +875,9 @@ Route::group(['middleware' => ['verified']], function () {
             'XSS',
         ]
     );
+    Route::get('leave/certificate/{id}/download', [LeaveController::class, 'downloadCertificate'])
+    ->name('leave.certificate.download');
+
     Route::post('leave/jsoncount', [LeaveController::class, 'jsoncount'])->name('leave.jsoncount')->middleware(
         [
             'auth',
