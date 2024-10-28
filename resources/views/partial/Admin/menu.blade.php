@@ -294,7 +294,7 @@
             <!--timesheet-->
 
             <!-- performance-->
-            @if (Gate::check('Manage Indicator') || Gate::check('Manage Appraisal') || Gate::check('Manage Goal Tracking') || Gate::check('Show Indicator'))
+            @if (Gate::check('Manage Indicator') || Gate::check('Manage Appraisal') || Gate::check('Manage Goal Tracking') || Gate::check('Show Indicator') || Gate::check('Show Appraisal'))
                 <li class="dash-item dash-hasmenu">
                     <a href="#!" class="dash-link"><span class="dash-micon"><i
                                 class="ti ti-3d-cube-sphere"></i></span><span
@@ -319,19 +319,20 @@
                                 <a class="dash-link" href="{{ route('appraisal.index') }}">{{ __('Appraisal') }}</a>
                             </li>
                         @endcan
-                        
-                        @can('Show Indicator') 
-                           <li class="dash-item">
-                               <a class="dash-link" href="{{ route('indicator.index') }}">{{ __('Indicator') }}</a>
-                           </li>
-                       @endcan
 
-                       @can('Show Appraisal')
-                           <li class="dash-item">
-                               <a class="dash-link" href="{{ route('appraisal.index') }}">{{ __('Appraisal') }}</a>
-                           </li>
-                       @endcan
+                        @if(\Auth::user()->type != 'company' && \Auth::user()->type != 'super admin' && \Auth::user()->type != 'Administrator (Employee)')
+                            @can('Show Indicator') 
+                                <li class="dash-item">
+                                    <a class="dash-link" href="{{ route('indicator.index') }}">{{ __('Indicator') }}</a>
+                                </li>
+                            @endcan
 
+                            @can('Show Appraisal')
+                                <li class="dash-item">
+                                    <a class="dash-link" href="{{ route('appraisal.index') }}">{{ __('Appraisal') }}</a>
+                                </li>
+                            @endcan
+                        @endif
                        
                     </ul>
                 </li>

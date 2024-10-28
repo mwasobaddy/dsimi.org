@@ -27,7 +27,21 @@ class IndicatorController extends Controller
             }
 
             return view('indicator.index', compact('indicators'));
-        } else {
+        }
+        else if(\Auth::user()->can('Show Indicator')){
+            $user = \Auth::user();
+            if ($user->type == 'employee') {
+                $employee = Employee::where('user_id', $user->id)->first();
+
+                $indicators = Indicator::where('created_by', '=', $user->creatorId())->where('branch', $employee->branch_id)->where('department', $employee->department_id)->where('designation', $employee->designation_id)->get();
+            } else {
+                $indicators = Indicator::where('created_by', '=', $user->creatorId())->with(['branches', 'departments', 'designations', 'user'])->get();
+            }
+
+            return view('indicator.index', compact('indicators'));
+        }
+
+        else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -91,13 +105,15 @@ class IndicatorController extends Controller
     public function show(Indicator $indicator)
     {
         
-        $ratings = json_decode($indicator->rating, true);
-        $performance_types = Performance_Type::where('created_by', '=', \Auth::user()->creatorId())->get();
-        // $technicals      = Competencies::where('created_by', \Auth::user()->creatorId())->where('type', 'technical')->get();
-        // $organizationals = Competencies::where('created_by', \Auth::user()->creatorId())->where('type', 'organizational')->get();
-        // $behaviourals = Competencies::where('created_by', \Auth::user()->creatorId())->where('type', 'behavioural')->get();
+        if (\Auth::user()->can('Show Indicator')) {
+            $ratings = json_decode($indicator->rating, true);
+            $performance_types = Performance_Type::where('created_by', '=', \Auth::user()->creatorId())->get();
+            // $technicals      = Competencies::where('created_by', \Auth::user()->creatorId())->where('type', 'technical')->get();
+            // $organizationals = Competencies::where('created_by', \Auth::user()->creatorId())->where('type', 'organizational')->get();
+            // $behaviourals = Competencies::where('created_by', \Auth::user()->creatorId())->where('type', 'behavioural')->get();
 
-        return view('indicator.show', compact('indicator', 'ratings', 'performance_types'));
+            return view('indicator.show', compact('indicator', 'ratings', 'performance_types'));
+        }
     }
 
 

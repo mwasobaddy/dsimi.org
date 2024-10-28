@@ -34,6 +34,25 @@ class AppraisalController extends Controller
 
             return view('appraisal.index', compact('appraisals','competencyCount'));
         }
+        else if(\Auth::user()->can('Show Indicator'))
+        {
+            $user = \Auth::user();
+            if($user->type == 'employee')
+            {
+                $employee   = Employee::where('user_id', $user->id)->first();
+                $competencyCount = Competencies::where('created_by', '=', $user->creatorId())->count();
+                $appraisals = Appraisal::where('created_by', '=', \Auth::user()->creatorId())->where('branch', $employee->branch_id)->where('employee', $employee->id)->get();
+                
+            }
+            else
+            {
+                $competencyCount = Competencies::where('created_by', '=', $user->creatorId())->count();
+                $appraisals = Appraisal::where('created_by', '=', \Auth::user()->creatorId())->get();
+              
+            }
+
+            return view('appraisal.index', compact('appraisals','competencyCount'));
+        }
         else
         {
             return redirect()->back()->with('error', __('Permission denied.'));
