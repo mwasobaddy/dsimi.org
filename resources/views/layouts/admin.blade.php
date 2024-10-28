@@ -74,6 +74,7 @@
     <link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/fonts/material.css') }}">
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+    
 
     <!-- vendor css -->
 

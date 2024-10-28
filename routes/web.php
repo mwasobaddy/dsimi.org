@@ -115,6 +115,8 @@ use App\Http\Controllers\ToyyibpayPaymentController;
 use App\Http\Controllers\XenditPaymentController;
 use App\Http\Controllers\YooKassaController;
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\HPermissionController;
+
 
 // use App\Http\Controllers\PlanRequestController;
 
@@ -147,6 +149,44 @@ Route::get('/check', [HomeController::class, 'check'])->middleware(
         'XSS',
     ]
 );
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/hpermissions', [HPermissionController::class, 'index'])->name('hpermissions.index');
+    Route::get('/hpermissions/create', [HPermissionController::class, 'create'])->name('hpermissions.create');
+    Route::post('/hpermissions/store', [HPermissionController::class, 'store'])->name('hpermissions.store');
+    Route::post('/hpermissions/{permission}/approve', [HPermissionController::class, 'approve'])->name('hpermissions.approve');
+    Route::post('/hpermissions/{permission}/reject', [HPermissionController::class, 'reject'])->name('hpermissions.reject');
+});
+// Route for displaying the list of hourly permission requests
+// Route::get('/permissions', [HPermissionController::class, 'index'])
+//     ->name('permissions.index')
+//     ->middleware('can:Hourly Permission Requests');
+
+// // Route for creating a new hourly permission request
+// Route::get('/permissions/create', [HPermissionController::class, 'create'])
+//     ->name('permissions.create')
+//     ->middleware('can:Hourly Permission Requests');
+
+// // Route for storing a new hourly permission request
+// Route::post('/permissions', [HPermissionController::class, 'store'])
+//     ->name('permissions.store')
+//     ->middleware('can:Hourly Permission Requests');
+
+// // Route for editing an existing hourly permission request
+// Route::get('/permissions/{id}/edit', [HPermissionController::class, 'edit'])
+//     ->name('permissions.edit')
+//     ->middleware('can:Hourly Permission Requests');
+
+// // Route for updating an existing hourly permission request
+// Route::put('/permissions/{id}', [HPermissionController::class, 'update'])
+//     ->name('permissions.update')
+//     ->middleware('can:Hourly Permission Requests');
+
+// Route for deleting an hourly permission request
+Route::delete('/permissions/{id}', [HPermissionController::class, 'destroy'])
+    ->name('permissions.destroy')
+    ->middleware('can:Hourly Permission Requests');
+
 // Route::get('/password/resets/{lang?}', 'Auth\LoginController@showLinkRequestForm')->name('change.langPass');
 
 Route::get('/', [HomeController::class, 'index'])->name('home')->middleware(['XSS']);

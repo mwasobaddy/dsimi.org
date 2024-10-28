@@ -2263,7 +2263,6 @@ class Utility extends Model
             "Create Contract Type",
             "Edit Contract Type",
             "Delete Contract Type",
-            "Hourly Permission Requests",
         ];
 
         $hr_permission = Role::where('name', 'hr')->where('created_by', $company_id)->where('guard_name', 'web')->first();
@@ -2328,7 +2327,6 @@ class Utility extends Model
             "Store Comment",
             "Delete Comment",
             "Delete Attachment",
-            "Hourly Permission Requests",
         ];
 
         $employee_permission = Role::where('name', 'employee')->where('created_by', $company_id)->where('guard_name', 'web')->first();

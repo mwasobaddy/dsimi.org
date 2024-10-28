@@ -245,11 +245,9 @@
                             </li>
 
                         <?php endif; ?>
-                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Hourly Permission Requests')): ?>
                         <li class="dash-item">
-                            <a class="dash-link" href="<?php echo e(route('permissions.index')); ?>"><?php echo e(__('Hourly Permission Requests')); ?></a>
+                            <a class="dash-link" href="<?php echo e(route('hpermissions.index')); ?>"><?php echo e(__('Hourly Permission Requests')); ?></a>
                         </li>
-                    <?php endif; ?>
                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Manage Attendance')): ?>
                             <li class="dash-item dash-hasmenu">
                                 <a href="#!" class="dash-link"><span
