@@ -159,6 +159,14 @@ class HomeController extends Controller
 
                 $chartData = $this->getOrderChart(['duration' => 'week']);
 
+<<<<<<< HEAD
+                return view('dashboard.super_admin', compact('user', 'chartData'));
+            } else {
+=======
+                return view('dashboard.admin', compact('user', 'chartData'));
+            } 
+            else {
+>>>>>>> 742ae9a08c58f457cbc59ddd73680f2df21fbeea
 
                 $events    = Event::where('created_by', '=', \Auth::user()->creatorId())->get();
                 $arrEvents = [];
