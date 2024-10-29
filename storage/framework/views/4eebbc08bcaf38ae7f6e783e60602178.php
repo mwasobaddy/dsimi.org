@@ -343,10 +343,9 @@
 
                                         <div class="form-icon-user">
                                             <?php echo e(Form::select('role', [
-                                                'Responsable Hiérarchique' => 'Responsable Hiérarchique',
-                                                'Agent' => 'Agent',
-                                                'Administrator (Employee)' => 'Administrator (Employee)',
+                                                'Agent (Employee)' => 'Agent (Employee)',
                                                 'Line Manager (Employee)' => 'Line Manager (Employee)',
+                                                'Administrator (Employee)' => 'Administrator (Employee)',
                                             ], null, [
                                                 'class' => 'form-control role', 
                                                 'required' => 'required', 
@@ -425,74 +424,6 @@
             getDepartment(branch_id);
         });
 
-        // function getDepartment(bid) {
-
-        //     $.ajax({
-        //         url: '<?php echo e(route('monthly.getdepartment')); ?>',
-        //         type: 'POST',
-        //         data: {
-        //             "branch_id": bid,
-        //             "_token": "<?php echo e(csrf_token()); ?>",
-        //         },
-        //         success: function(data) {
-
-        //             $('.department_id').empty();
-        //             var emp_selct = `<select class="form-control department_id" name="department_id" id="choices-multiple"
-        //                                     placeholder="Select Department" required>
-        //                                     </select>`;
-        //             $('.department_div').html(emp_selct);
-
-        //             $('.department_id').append('<option value=""> <?php echo e(__('Select Department')); ?> </option>');
-        //             $.each(data, function(key, value) {
-        //                 $('.department_id').append('<option value="' + key + '">' + value +
-        //                     '</option>');
-        //             });
-        //             new Choices('#choices-multiple', {
-        //                 removeItemButton: true,
-        //             });
-        //         }
-        //     });
-        // }
-
-        // $(document).ready(function() {
-        //     var d_id = $('.department_id').val();
-        //     getDesignation(d_id);
-        // });
-
-        // $(document).on('change', 'select[name=department_id]', function() {
-        //     var department_id = $(this).val();
-        //     getDesignation(department_id);
-        // });
-
-        // function getDesignation(did) {
-
-        //     $.ajax({
-        //         url: '<?php echo e(route('employee.json')); ?>',
-        //         type: 'POST',
-        //         data: {
-        //             "department_id": did,
-        //             "_token": "<?php echo e(csrf_token()); ?>",
-        //         },
-        //         success: function(data) {
-
-        //             $('.designation_id').empty();
-            
-        //             var emp_selct = `<select class="form-control designation_id" name="designation_id"
-        //                                          placeholder="Select Designation" required>
-        //                                     </select>`;
-        //             $('.designation_div').html(emp_selct);
-
-        //             $('.designation_id').append('<option value=""> <?php echo e(__('Select Designation')); ?> </option>');
-        //             $.each(data, function(key, value) {
-        //                 $('.designation_id').append('<option value="' + key + '">' + value +
-        //                     '</option>');
-        //             });
-        //             new Choices('#choices-multiple', {
-        //                 removeItemButton: true,
-        //             });
-        //         }
-        //     });
-        // }
     </script>
 
     <script>

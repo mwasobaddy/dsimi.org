@@ -55,12 +55,39 @@
                                         <td><?php echo e($permission->request_date); ?></td>
                                         <td><?php echo e($permission->start_time); ?></td>
                                         <td><?php echo e($permission->end_time); ?></td>
-                                        <td><?php echo e($permission->status); ?></td>
-                                        <td><?php echo e($permission->reason); ?></td>
                                         <td>
-                                            <!-- Actions like Edit/Delete can go here -->
-                                            
+                                            <?php if($permission->status == 'Pending'): ?>
+                                                <div class="badge bg-warning p-2 px-3 rounded status-badge5">
+                                                    <?php echo e(__('En attente')); ?>
+
+                                                </div>
+                                            <?php elseif($permission->status == 'Approved'): ?>
+                                                <div class="badge bg-success p-2 px-3 rounded status-badge5">
+                                                    <?php echo e(__('Approuvé')); ?>
+
+                                                </div>
+                                            <?php elseif($permission->status == 'Reject'): ?>
+                                                <div class="badge bg-danger p-2 px-3 rounded status-badge5">
+                                                    <?php echo e(__('Rejeté')); ?>
+
+                                                </div>
+                                            <?php else: ?>
+                                                <div class="badge bg-secondary p-2 px-3 rounded status-badge5">
+                                                    <?php echo e($permission->status); ?>
+
+                                                </div>
+                                            <?php endif; ?>
+                                        </td>                                      
+                                          <td><?php echo e($permission->reason); ?></td>
+                                          <td class="Action">
+                                            <?php if(Auth::user()->type == 'company' || Auth::user()->type == 'Line Manager (Employee)' || Auth::user()->type == 'hr' || strtolower(Auth::user()->type) == 'super admin'): ?>
+                                            <div class="modal-footer">
+                                                <input type="submit" value="<?php echo e(__('Approved')); ?>" class="btn btn-success rounded" name="status">
+                                                <input type="submit" value="<?php echo e(__('Reject')); ?>" class="btn btn-danger rounded" name="status">
+                                            </div>
+                                        <?php endif; ?>
                                         </td>
+                                      
                                     </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>

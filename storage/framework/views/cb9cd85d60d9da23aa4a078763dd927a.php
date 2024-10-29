@@ -155,6 +155,19 @@
                             class="dash-link"><span class="dash-micon"><i class="ti ti-user"></i></span><span
                                 class="dash-mtext"><?php echo e(__('Employee')); ?></span></a>
                     </li>
+
+                <?php elseif(\Auth::user()->type == 'Line Manager (Employee)'): ?>
+                    <?php
+                        $currentEmployee = App\Models\Employee::where('user_id', \Auth::user()->id)->first();
+                        $employees = App\Models\Employee::where('supervisor_n1', $currentEmployee->name)
+                            ->orWhere('supervisor_n2', $currentEmployee->name)
+                            ->get();
+                    ?>
+                    <li class="dash-item <?php echo e(Request::segment(1) == 'employee' ? 'active' : ''); ?>">
+                        <a href="<?php echo e(route('show_employee_supervise.showall')); ?>" class="dash-link"><span class="dash-micon"><i
+                                    class="ti ti-user"></i></span><span
+                                class="dash-mtext"><?php echo e(__('Mes collaborateurs')); ?></span></a>
+                    </li>
                 <?php else: ?>
                     <li class="dash-item <?php echo e(Request::segment(1) == 'employee' ? 'active' : ''); ?>">
                         <a href="<?php echo e(route('employee.index')); ?>" class="dash-link"><span class="dash-micon"><i
@@ -280,7 +293,7 @@
             <!--timesheet-->
 
             <!-- performance-->
-            <?php if(Gate::check('Manage Indicator') || Gate::check('Manage Appraisal') || Gate::check('Manage Goal Tracking')): ?>
+            <?php if(Gate::check('Manage Indicator') || Gate::check('Manage Appraisal') || Gate::check('Manage Goal Tracking') || Gate::check('Show Indicator')): ?>
                 <li class="dash-item dash-hasmenu">
                     <a href="#!" class="dash-link"><span class="dash-micon"><i
                                 class="ti ti-3d-cube-sphere"></i></span><span
@@ -294,7 +307,7 @@
                             </li>
                         <?php endif; ?>
                         
-                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Manage Indicator')): ?>
+                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Manage Indicator')): ?> 
                             <li class="dash-item">
                                 <a class="dash-link" href="<?php echo e(route('indicator.index')); ?>"><?php echo e(__('Indicator')); ?></a>
                             </li>
@@ -305,6 +318,18 @@
                                 <a class="dash-link" href="<?php echo e(route('appraisal.index')); ?>"><?php echo e(__('Appraisal')); ?></a>
                             </li>
                         <?php endif; ?>
+                        
+                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Show Indicator')): ?> 
+                           <li class="dash-item">
+                               <a class="dash-link" href="<?php echo e(route('indicator.index')); ?>"><?php echo e(__('Indicator')); ?></a>
+                           </li>
+                       <?php endif; ?>
+
+                       <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('Show Appraisal')): ?>
+                           <li class="dash-item">
+                               <a class="dash-link" href="<?php echo e(route('appraisal.index')); ?>"><?php echo e(__('Appraisal')); ?></a>
+                           </li>
+                       <?php endif; ?>
 
                        
                     </ul>
@@ -409,7 +434,7 @@
                     Gate::check('Manage Warning') ||
                     Gate::check('Manage Termination') ||
                     Gate::check('Manage Announcement') ||
-                    Gate::check('Manage Holiday')) && Auth::user()->type != 'employee'): ?>
+                    Gate::check('Manage Holiday')) && Auth::user()->type != 'employee' && Auth::user()->type != 'Line Manager (Employee)'): ?>
                 <li
                     class="dash-item dash-hasmenu <?php echo e(Request::segment(1) == 'holiday' ? 'dash-trigger active' : ''); ?>">
                     <a href="#!" class="dash-link">

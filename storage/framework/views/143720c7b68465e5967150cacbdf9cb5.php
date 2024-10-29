@@ -47,7 +47,9 @@
                                     <th><?php echo e(__('Total Days')); ?></th>
                                     <th><?php echo e(__('Leave Reason')); ?></th>
                                     <th><?php echo e(__('Status')); ?></th>
+                                    <th><?php echo e(__('Certificate')); ?></th>
                                     <th width="200px"><?php echo e(__('Action')); ?></th>
+                                  
                                 </tr>
                             </thead>
                             <tbody>
@@ -88,6 +90,14 @@
 
                                                 </div>
                                             <?php endif; ?>
+                                        </td>
+                                        <td>
+                                        <?php if($leave->status == 'Approved' && $leave->certificate_path): ?>
+    <a href="<?php echo e(route('leave.certificate.download', $leave->id)); ?>" 
+       class="btn btn-sm btn-primary">
+        Download Certificate
+    </a>
+<?php endif; ?>
                                         </td>
                                         <td class="Action">
                                             <span>

@@ -38,7 +38,7 @@
     </div>
 </div>
 
-<?php if(Auth::user()->type == 'company' || Auth::user()->type == 'hr' || strtolower(Auth::user()->type) == 'super admin'): ?>
+<?php if(Auth::user()->type == 'company' || Auth::user()->type == 'Line Manager (Employee)' || Auth::user()->type == 'hr' || strtolower(Auth::user()->type) == 'super admin'): ?>
     <div class="modal-footer">
         <input type="submit" value="<?php echo e(__('Approved')); ?>" class="btn btn-success rounded" name="status">
         <input type="submit" value="<?php echo e(__('Reject')); ?>" class="btn btn-danger rounded" name="status">

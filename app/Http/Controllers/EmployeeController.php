@@ -209,18 +209,6 @@ public function showEmployeeSupervise()
                 $document_implode = null;
             }
 
-<<<<<<< HEAD
-        // // Create the user first
-        // $user = User::create([
-        //     'name' => $request['first_name'] . ' ' . $request['last_name'],
-        //     'email' => $request['email'],
-        //     'password' => Hash::make($request['password']),
-        //     'type' => 'employee',
-        //     'lang' => !empty($default_language) ? $default_language->value : 'en',
-        //     'created_by' => \Auth::user()->creatorId(),
-        //     'email_verified_at' => now(), // Make sure $date is defined or use 'now()'
-        // ]);
-=======
 
            
 
@@ -233,7 +221,6 @@ public function showEmployeeSupervise()
 
 
             
->>>>>>> 742ae9a08c58f457cbc59ddd73680f2df21fbeea
             $employee = Employee::create(
                 [
                     'user_id' => $user->id,

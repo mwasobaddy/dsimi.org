@@ -8,11 +8,26 @@ use Illuminate\Http\Request;
 
 class HPermissionController extends Controller
 {
+ 
     public function index()
     {
-        $permissions = Permission::where('id', Auth::id())->get();
-        // $permissions = permission::all();
-        return view('hpermissions.index', compact('permissions'));
+        if(\Auth::user()->type == 'employee'){
+                $permissions = Permission::where('user_id', Auth::user()->id)->get();
+                
+                // $permissions = permission::all();
+                return view('hpermissions.index', compact('permissions'));
+        }
+        else if(\Auth::user()->type == 'Line Manager (Employee)'){
+            // 
+            $permissions = Permission::all();
+            return view('hpermissions.index', compact('permissions'));
+
+        }
+        else{
+            $permissions = Permission::all();
+            return view('hpermissions.index', compact('permissions'));
+
+        }
     }
 
     public function create()
@@ -51,6 +66,7 @@ class HPermissionController extends Controller
                 'status' => 'pending',
             ]);
     
+
             return redirect()->route('hpermissions.index')->with('success', 'Permission request submitted successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('errors', 'An error occurred while submitting the request.');
@@ -59,13 +75,18 @@ class HPermissionController extends Controller
 
     public function approve(Permission $permission)
     {
+        if(\Auth::user()->type == 'Line Manager (Employee)'){
+
         $permission->update(['status' => 'approved']);
         return back()->with('success', 'Permission approved successfully.');
+        }
     }
 
     public function reject(Permission $permission)
     {
+        if(\Auth::user()->type == 'Line Manager (Employee)'){
         $permission->update(['status' => 'rejected']);
         return back()->with('success', 'Permission rejected successfully.');
+        }
     }
 }
