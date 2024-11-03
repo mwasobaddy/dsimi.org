@@ -6,9 +6,18 @@ use App\Models\Permission;
 use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Services\HourlyLeaveCertificateService;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class HPermissionController extends Controller
 {
+    protected $certificateService;
+
+    public function __construct(HourlyLeaveCertificateService $certificateService)
+    {
+        $this->certificateService = $certificateService;
+    }
     public function index()
     {
         $permissions = Permission::where('user_id', Auth::user()->id)->get();
@@ -139,6 +148,16 @@ class HPermissionController extends Controller
             // Update the status
             if ($request->status === 'Approved') {
                 $permission->status = 'approved';
+
+                  // Generate certificate
+            try {
+                $certificateFilename = $this->certificateService->generateCertificate($permission);
+                $permission->certificate_path = $certificateFilename;
+                Log::info('Certificate generated: ' . $certificateFilename);
+            } catch (\Exception $e) {
+                Log::error('Certificate generation failed: ' . $e->getMessage());
+                Log::error($e->getTraceAsString());
+            }
                 $permission->save();
                 
                 \Log::info('Permission Approved:', ['permission_id' => $permission->id]);
@@ -163,4 +182,25 @@ class HPermissionController extends Controller
             return back()->with('error', 'An error occurred while updating the permission status.');
         }
     }
+    public function downloadCertificate($permissionId)
+{
+    $permission = Permission::findOrFail($permissionId);
+    
+    // Check if user has permission to download
+    if (!\Auth::user()->can('Manage Permission') && 
+        \Auth::user()->id != $permission->user_id) {
+        return redirect()->back()->with('error', __('Permission denied.'));
+    }
+
+    // Check if certificate exists
+    if (!$permission->certificate_path || 
+        !Storage::disk('public')->exists('certificates/' . $permission->certificate_path)) {
+        return redirect()->back()->with('error', __('Certificate not found.'));
+    }
+
+    return Storage::disk('public')->download(
+        'certificates/' . $permission->certificate_path,
+        'hourly_leave_certificate_' . $permission->id . '.pdf'
+    );
+}
 }

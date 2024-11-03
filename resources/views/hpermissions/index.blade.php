@@ -42,6 +42,7 @@
                                     <th>{{ __('End Time') }}</th>
                                     <th>{{ __('Status') }}</th>
                                     <th>{{ __('Reason') }}</th>
+                                    <th>{{__('Certificate')}}</th>
                                     
                                     @if (\Auth::user()->type != 'employee')
                                         <th>{{ __('Actions') }}</th>
@@ -58,6 +59,19 @@
                                         <td>{{ $permission->end_time }}</td>
                                         <td>{{ $permission->status }}</td>
                                         <td>{{ $permission->reason }}</td>
+                                        <td>
+                                            @if($permission->status == 'approved' && $permission->certificate_path)
+                                                <a href="{{ route('hpermission.certificate.download', $permission->id) }}" 
+                                                class="btn btn-sm btn-primary">
+                                                    <i class="ti ti-download"></i> 
+                                                    {{ __('Download Certificate') }}
+                                                </a>
+                                            @else
+                                                <div class="badge bg-secondary p-2 px-3 rounded">
+                                                    {{ __('Not Available') }}
+                                                </div>
+                                            @endif
+                                        </td>
                                             
                                         <td class="Action">
                                             <span>

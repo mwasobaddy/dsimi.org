@@ -1073,6 +1073,9 @@ Route::group(['middleware' => ['verified']], function () {
         ]
     );
 
+    Route::get('hpermission/certificate/{id}', [HPermissionController::class, 'downloadCertificate'])
+    ->name('hpermission.certificate.download');
+
     Route::resource('plans', PlanController::class)->middleware(
         [
             'auth',
